@@ -1,9 +1,11 @@
 describe Prueba do
-  let(:prueba) { Prueba.new }
+  let(:prueba) do
 
-  describe '#materia' do
-    it 'debería pasar este test' do
-      expect(prueba.materia).to be :tadp
+  end
+
+  describe '#BeforeAndAfter' do
+    it 'Al ejecutar un mensaje se muestre los before y after' do
+
     end
   end
 end
