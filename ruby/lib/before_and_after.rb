@@ -29,9 +29,9 @@ module BeforeAndAfter
 
       metodo = instance_method(nombre_metodo)
 
-      define_method(nombre_metodo) do |*args, &bloque|
+      define_method(nombre_metodo) do |args, &bloque|
         procsBeforeLocal.each{|procs| self.instance_eval &procs}
-        puts ("!! DEBUG !! Método siendo ejecutado:  #{nombre_metodo}") # metodo.call(*args, &bloque)
+        metodo.bind(self).call(args, &bloque)# metodo.bind(self).call() )
         procsAfterLocal.each{|procs| self.instance_eval &procs}
       end
 
@@ -46,7 +46,7 @@ def before_and_after(procBefore, procAfter)
   modulitoBAA = BeforeAndAfter
   modulitoBAA.agregarBeforeAndAfter(procBefore, procAfter)
   modulitoBAA.agregarReceptor(receptor)
-  receptor.include modulitoBAA
+  receptor.extend modulitoBAA
 
 end
 
@@ -54,22 +54,23 @@ end
 claseTest = Class.new do
   before_and_after( proc{puts "before"} , proc{puts "after"} )
 
-  def mensajeTest
+  def mensajeTest (unNumero)
     puts "!! DEBUG !!  Este mensaje va al medio"
+    puts unNumero*2
   end
 
   before_and_after( proc{puts "before de nuevo"} , proc{puts "after de nuevo"} )
 end
 
 contratoTest = claseTest.new
-contratoTest.mensajeTest
+contratoTest.mensajeTest(4)
 
 # contratoTest.define_singleton_method :metodoAgregado do
 #   puts "contenido metodo agregado"
 # end
 
-contratoTest.define_singleton_method :metodoAgregado do
-  puts "Metodo agregado"
-end
+#contratoTest.define_singleton_method :metodoAgregado do
+#  puts "Metodo agregado"
+#end
 
-contratoTest.metodoAgregado
+#contratoTest.metodoAgregado
