@@ -1,66 +1,58 @@
+require 'pry'
+
 module BeforeAndAfter
   attr_accessor :procsBefore, :procsAfter
 
-  def self.inicializarListas
+  def before_and_after(procBefore, procAfter)
+    self.inicializarListas
+    @procsBefore << procBefore
+    @procsAfter << procAfter
+  end
+
+  def inicializarListas
     if @procsBefore.nil?
       @procsBefore = []
       @procsAfter = []
     end
   end
 
-  def self.agregarBeforeAndAfter(procBefore,procAfter)
-    self.inicializarListas
-    @procsBefore << procBefore
-    @procsAfter << procAfter
-  end
+  def method_added(nombre_metodo)
+    puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}" # Debug!
 
-  def self.agregarReceptor(receptor)
-    @receptor = receptor
-    procsBeforeLocal = @procsBefore
-    procsAfterLocal = @procsAfter
+    chequear_actualizacion do
+      metodo = instance_method(nombre_metodo)
+      procsBefore = @procsBefore
+      procsAfter = @procsAfter
 
-    receptor.define_singleton_method(:method_added) do |nombre_metodo|
-      puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}" # Debug!
-
-      chequear_actualizacion do
-
-        metodo = instance_method(nombre_metodo)
-
-        define_method(nombre_metodo) do |args, &bloque|
-          procsBeforeLocal.each{|procs| self.instance_eval &procs}
-          metodo.bind(self).call(args, &bloque)# metodo.bind(self).call() )
-          procsAfterLocal.each{|procs| self.instance_eval &procs}
-        end
-
+      define_method(nombre_metodo) do |args, &bloque|
+        procsBefore.each{|procs| self.instance_eval &procs}
+        metodo.bind(self).call(args, &bloque)# metodo.bind(self).call() )
+        procsAfter.each{|procs| self.instance_eval &procs}
       end
-
     end
   end
 
   def chequear_actualizacion
-    if(@actualizando == true)
-      return
-    end
-    @actualizando = true
+    return if Thread.current[:__actualizando__]
 
-    yield
-
-    @actualizando = false
+    Thread.current[:__actualizando__] = true
+    yield if block_given?
+    Thread.current[:__actualizando__] = false
   end
 end
 
-def before_and_after(procBefore, procAfter)
-  receptor = procBefore.binding.receiver
 
-  modulitoBAA = BeforeAndAfter
-  modulitoBAA.agregarBeforeAndAfter(procBefore, procAfter)
-  modulitoBAA.agregarReceptor(receptor)
-  receptor.extend modulitoBAA
 
+module Contratos
+  def self.included(klass)
+    klass.extend BeforeAndAfter
+  end
 end
 
 # USO!
 claseTest = Class.new do
+  include Contratos
+
   before_and_after( proc{puts "before"} , proc{puts "after"} )
 
   def mensajeTest (unNumero)

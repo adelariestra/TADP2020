@@ -1,21 +1,12 @@
+require_relative '../lib/prueba'
 
 describe Prueba do
-  let(:prueba) do
-    class ClaseTest
-      before_and_after( proc{puts "before"} , proc{puts "after"} )
-
-      def mensajeTest
-        puts "medio"
-      end
-
-      before_and_after( proc{puts "before"} , proc{puts "after"} )
-
-    end
-  end
+  subject { ClaseTest.new }
 
   describe '#BeforeAndAfter' do
     it 'Al ejecutar un mensaje en clase before_and_after ejecuta procs definidos' do
-
+      subject.mensajeTest
+      expect(subject.antes).to eq(1)
     end
   end
 end
