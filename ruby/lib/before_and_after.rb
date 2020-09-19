@@ -19,24 +19,33 @@ module BeforeAndAfter
     procsBeforeLocal = @procsBefore
     procsAfterLocal = @procsAfter
 
-    @receptor.define_singleton_method(:method_added) do |nombre_metodo|
+    receptor.define_singleton_method(:method_added) do |nombre_metodo|
       puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}" # Debug!
 
-      if(@actualizando == true)
-        return
+      chequear_actualizacion do
+
+        metodo = instance_method(nombre_metodo)
+
+        define_method(nombre_metodo) do |args, &bloque|
+          procsBeforeLocal.each{|procs| self.instance_eval &procs}
+          metodo.bind(self).call(args, &bloque)# metodo.bind(self).call() )
+          procsAfterLocal.each{|procs| self.instance_eval &procs}
+        end
+
       end
-      @actualizando = true
 
-      metodo = instance_method(nombre_metodo)
-
-      define_method(nombre_metodo) do |args, &bloque|
-        procsBeforeLocal.each{|procs| self.instance_eval &procs}
-        metodo.bind(self).call(args, &bloque)# metodo.bind(self).call() )
-        procsAfterLocal.each{|procs| self.instance_eval &procs}
-      end
-
-      @actualizando = false
     end
+  end
+
+  def chequear_actualizacion
+    if(@actualizando == true)
+      return
+    end
+    @actualizando = true
+
+    yield
+
+    @actualizando = false
   end
 end
 
