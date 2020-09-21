@@ -9,6 +9,17 @@ module BeforeAndAfter
     @procsAfter << procAfter
   end
 
+  def agregar_before(procBefore)
+    inicializarListasBaA
+    @procsBefore << procBefore
+  end
+
+  def agregar_after(procAfter)
+    inicializarListasBaA
+    @procsAfter << procAfter
+  end
+
+
   def inicializarListasBaA
     if @procsBefore.nil?
       @procsBefore = []

@@ -6,15 +6,18 @@ module Invariant
   # Puede definirse mas de una (lsita)
   # si no se cumple, se lanza un excepción
 
-  def invariant(procInvariant)
-    inicializarListaInvariants
-    @invariants<<procInvariant
-  end
-
-  def inicializarListaInvariants
-    if @invariants.nill?
-      @invariants = []
+  def invariant (&procInvariant)
+    # convertir invariant a que si da false
+    nuevaInvariant = proc do
+      if (instance_eval(&procInvariant) == false)
+        raise InvalidInvariant.new
+      end
     end
+
+    # redefinir cualquier metodo existente para que en el after tenga la invariant reconvertida
+    agregar_after(nuevaInvariant)
+
+    # redefinir el new para que despues tenga la invariant reconvertida
   end
 
 end
