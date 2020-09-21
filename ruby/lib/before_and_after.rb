@@ -1,85 +1,53 @@
+require 'pry' # para poder debuggear más cómodos
+
 module BeforeAndAfter
   attr_accessor :procsBefore, :procsAfter
 
-  def self.inicializarListas
+  def before_and_after(procBefore, procAfter)
+    inicializarListas
+    @procsBefore << procBefore
+    @procsAfter << procAfter
+  end
+
+  def inicializarListas
     if @procsBefore.nil?
       @procsBefore = []
       @procsAfter = []
     end
   end
 
-  def self.agregarBeforeAndAfter(procBefore,procAfter)
-    self.inicializarListas
-    @procsBefore << procBefore
-    @procsAfter << procAfter
-  end
+  def method_added(nombre_metodo)
+    puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}" # Debug!
 
-  def self.agregarReceptor(receptor)
-    @receptor = receptor
-    procsBeforeLocal = @procsBefore
-    procsAfterLocal = @procsAfter
+    chequear_actualizacion do # Método utilizado para evitar recursividad infinita
+      metodo = instance_method(nombre_metodo)
 
-    receptor.define_singleton_method(:method_added) do |nombre_metodo|
-      puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}" # Debug!
+      # Hace falta guardar en locales porque las utilizaremos dentro del contexto del proc, el cual no es el mismo que el de la instancia
+      procsBefore = @procsBefore
+      procsAfter = @procsAfter
 
-      chequear_actualizacion do
-
-        metodo = instance_method(nombre_metodo)
-
-        define_method(nombre_metodo) do |args, &bloque|
-          procsBeforeLocal.each{|procs| self.instance_eval &procs}
-          metodo.bind(self).call(args, &bloque)# metodo.bind(self).call() )
-          procsAfterLocal.each{|procs| self.instance_eval &procs}
-        end
-
+      # Redefinición del método para agregarle comportamiento
+      define_method(nombre_metodo) do |*args, &bloque|
+        procsBefore.each{|procs| self.instance_eval &procs} # Ejecutar el proc en el contexto de self (osea de la clase)
+        metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la clase)
+        procsAfter.each{|procs| self.instance_eval &procs}
       end
-
     end
   end
+
 
   def chequear_actualizacion
-    if(@actualizando == true)
-      return
-    end
-    @actualizando = true
+    # Para evitar tener un atributo con un nombre que podria existir en la clase, utilizo una "variable" del contexto del thread de ejecución
+    return if Thread.current[:__actualizando__] # si ya esta overrideando skipeo
 
-    yield
-
-    @actualizando = false
+    Thread.current[:__actualizando__] = true
+    yield if block_given?   # ejecutar el bloque entrante
+    Thread.current[:__actualizando__] = false
   end
 end
 
-def before_and_after(procBefore, procAfter)
-  receptor = procBefore.binding.receiver
-
-  modulitoBAA = BeforeAndAfter
-  modulitoBAA.agregarBeforeAndAfter(procBefore, procAfter)
-  modulitoBAA.agregarReceptor(receptor)
-  receptor.extend modulitoBAA
-
-end
-
-# USO!
-claseTest = Class.new do
-  before_and_after( proc{puts "before"} , proc{puts "after"} )
-
-  def mensajeTest (unNumero)
-    puts "!! DEBUG !!  Este mensaje va al medio"
-    puts unNumero*2
+module Contratos
+  def self.included(klass) # Cuando el módulo es incluido....
+    klass.extend BeforeAndAfter # Extiendo el comportamiento de la clase para que entienda mensajes del contrato
   end
-
-  before_and_after( proc{puts "before de nuevo"} , proc{puts "after de nuevo"} )
 end
-
-contratoTest = claseTest.new
-contratoTest.mensajeTest(4)
-
-# contratoTest.define_singleton_method :metodoAgregado do
-#   puts "contenido metodo agregado"
-# end
-
-#contratoTest.define_singleton_method :metodoAgregado do
-#  puts "Metodo agregado"
-#end
-
-#contratoTest.metodoAgregado
