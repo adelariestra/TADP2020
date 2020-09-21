@@ -66,7 +66,9 @@ describe BeforeAndAfter do
     end
 
   end
+end
 
+describe Invariant do
   describe '#Invariants' do
     it 'Si al crear el objeto la invariant se cumple, no tira error' do
       class Guerrero
