@@ -107,6 +107,30 @@ describe BeforeAndAfter do
       expect { subject.arakiri }.to raise_error(InvalidInvariant)
     end
 
+    it 'Al haber una clase con más de una invariant, ambas se ejecutan' do
+      class Espadachin
+        attr_accessor :vida
+
+        include Contratos
+        invariant { vida >= 0 }
+        invariant { vida < 1000 }
+
+        def initialize(cantidad_vida)
+          @vida = cantidad_vida
+        end
+
+        def arakiri
+          @vida = -999
+        end
+
+        def arakiriFallido
+          @vida = 1
+        end
+
+      end
+
+      expect { subject = Espadachin.new(1010) }.to raise_error(InvalidInvariant)
+    end
   end
 end
 
