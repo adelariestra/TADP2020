@@ -1,10 +1,5 @@
 module Invariant
   attr_accessor :invariants
-  # Invariant tiene forma de condicion, es un proc
-  # Esa condición debe analizarse al instanciar un objeto (deaspues del new)
-  # y al correr un metodo (after)7
-  # Puede definirse mas de una (lsita)
-  # si no se cumple, se lanza un excepción
 
   def invariant (&procInvariant)
     # convertir invariant a que si da false
@@ -15,9 +10,8 @@ module Invariant
     end
 
     # redefinir cualquier metodo existente para que en el after tenga la invariant reconvertida
+    # como el método initialize se agrega después de la ejecución, tambien se overridea
     agregar_after(nuevaInvariant)
-
-    # redefinir el new para que despues tenga la invariant reconvertida
   end
 
 end
