@@ -3,6 +3,8 @@
 
 require 'rspec' # utilizado para los tests
 
-require_relative '../lib/before_and_after'
+require_relative '../lib/BeforeAndAfter'
+require_relative '../lib/Contratos'
+require_relative '../lib/Invariant'
 
 

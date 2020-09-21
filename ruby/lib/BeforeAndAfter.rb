@@ -3,13 +3,13 @@ require 'pry' # para poder debuggear más cómodos
 module BeforeAndAfter
   attr_accessor :procsBefore, :procsAfter
 
-  def before_and_after(procBefore, procAfter)
-    inicializarListas
+  def before_and_after_each_call(procBefore, procAfter)
+    inicializarListasBaA
     @procsBefore << procBefore
     @procsAfter << procAfter
   end
 
-  def inicializarListas
+  def inicializarListasBaA
     if @procsBefore.nil?
       @procsBefore = []
       @procsAfter = []
@@ -17,7 +17,7 @@ module BeforeAndAfter
   end
 
   def method_added(nombre_metodo)
-    puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}" # Debug!
+    # puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}"
 
     chequear_actualizacion do # Método utilizado para evitar recursividad infinita
       metodo = instance_method(nombre_metodo)
@@ -43,11 +43,5 @@ module BeforeAndAfter
     Thread.current[:__actualizando__] = true
     yield if block_given?   # ejecutar el bloque entrante
     Thread.current[:__actualizando__] = false
-  end
-end
-
-module Contratos
-  def self.included(klass) # Cuando el módulo es incluido....
-    klass.extend BeforeAndAfter # Extiendo el comportamiento de la clase para que entienda mensajes del contrato
   end
 end
