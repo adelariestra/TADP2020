@@ -2,11 +2,27 @@ require 'pry' # para poder debuggear más cómodos
 
 module BeforeAndAfter
   attr_accessor :procsBefore, :procsAfter
+  attr_accessor :bufferPrecondicion, :bufferPostcondicion
 
   def before_and_after_each_call(procBefore, procAfter)
     inicializarListasBaA
     @procsBefore << procBefore
     @procsAfter << procAfter
+  end
+
+  def agregarBeforeABufffer(procBefore)
+
+    @bufferPrecondicion = procBefore
+  end
+
+  def agregarAfterABufffer(procAfter)
+
+    @bufferPostcondicion = procAfter
+  end
+
+  def limpiarBuffers()
+    @bufferPrecondicion = nil
+    @bufferPostcondicion = nil
   end
 
   def agregar_before(procBefore)
@@ -30,7 +46,7 @@ module BeforeAndAfter
   def method_added(nombre_metodo)
     # puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}"
     puts nombre_metodo
-
+    inicializarListasBaA
     chequear_actualizacion do # Método utilizado para evitar recursividad infinita
       metodo = instance_method(nombre_metodo)
 
@@ -38,12 +54,22 @@ module BeforeAndAfter
       procsBefore = @procsBefore
       procsAfter = @procsAfter
 
+      bufferPrecondicion = @bufferPrecondicion
+      bufferPostcondicion = @bufferPostcondicion
+
       # Redefinición del método para agregarle comportamiento
       define_method(nombre_metodo) do |*args, &bloque|
         procsBefore.each{|procs| self.instance_eval &procs} # Ejecutar el proc en el contexto de self (osea de la clase)
+
+        self.instance_eval(&bufferPrecondicion) unless (bufferPrecondicion.nil?)
+
         metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la clase)
+
+        self.instance_eval(&bufferPostcondicion) unless (bufferPostcondicion.nil?)
+
         procsAfter.each{|procs| self.instance_eval &procs}
       end
+      limpiarBuffers()
     end
   end
 

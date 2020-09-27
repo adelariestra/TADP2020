@@ -1,6 +1,4 @@
 module Invariant
-  attr_accessor :invariants
-
   def invariant (&procInvariant)
     # convertir invariant a que si da false
     nuevaInvariant = proc do
