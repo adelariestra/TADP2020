@@ -1,4 +1,4 @@
-require 'pry' # para poder debuggear más cómodos
+
 
 module BeforeAndAfter
   attr_accessor :procsBefore, :procsAfter
@@ -45,7 +45,6 @@ module BeforeAndAfter
 
   def method_added(nombre_metodo)
     # puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}"
-    puts nombre_metodo
     inicializarListasBaA
     chequear_actualizacion do # Método utilizado para evitar recursividad infinita
       metodo = instance_method(nombre_metodo)
