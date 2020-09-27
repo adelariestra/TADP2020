@@ -53,23 +53,23 @@ module BeforeAndAfter
       # Hace falta guardar en locales porque las utilizaremos dentro del contexto del proc, el cual no es el mismo que el de la instancia
       procsBefore = @procsBefore
       procsAfter = @procsAfter
-
       bufferPrecondicion = @bufferPrecondicion
       bufferPostcondicion = @bufferPostcondicion
 
       # Redefinición del método para agregarle comportamiento
       define_method(nombre_metodo) do |*args, &bloque|
-        procsBefore.each{|procs| self.instance_eval &procs} # Ejecutar el proc en el contexto de self (osea de la clase)
-
+        # Precondiciones
         self.instance_eval(&bufferPrecondicion) unless (bufferPrecondicion.nil?)
 
+        # Agregar metodos del before and after
+        procsBefore.each{|procs| self.instance_eval &procs} # Ejecutar el proc en el contexto de self (osea de la clase)
         metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la clase)
-
-        self.instance_eval(&bufferPostcondicion) unless (bufferPostcondicion.nil?)
-
         procsAfter.each{|procs| self.instance_eval &procs}
+
+        # Postcondiciones
+        self.instance_eval(&bufferPostcondicion) unless (bufferPostcondicion.nil?)
       end
-      limpiarBuffers()
+      limpiarBuffers() # Para que no afecte a los siguientes métodos
     end
   end
 

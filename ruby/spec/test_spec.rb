@@ -149,7 +149,6 @@ describe PreYPostCondiciones do
           @incremento_violencia = cant_incremento_violencia
         end
 
-
         pre { @paciencia > 80 }
         post { @violencia < 50 }
         def retarPersonaSinMatarla()

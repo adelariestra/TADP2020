@@ -1,26 +1,20 @@
 module PreYPostCondiciones
   def pre (&procPrecondicion)
-    # convertir invariant a que si da false explota
+    # convertir condición a que si da false lance la excepcion apropiada
     nuevaInvariant = proc do
-      if (instance_eval(&procPrecondicion) == false)
-        raise PreconditionsNotMet.new
-      end
+      raise(PreconditionsNotMet.new) unless (instance_eval(&procPrecondicion))
     end
 
     agregarBeforeABufffer(nuevaInvariant)
   end
 
   def post (&procPostcondicion)
-    # convertir invariant a que si da false explota
+    # convertir condición a que si da false lance la excepcion apropiada
     nuevaInvariant = proc do
-      if (instance_eval(&procPostcondicion) == false)
-        raise PostconditionsNotMet.new
-      end
+      raise(PostconditionsNotMet.new) unless (instance_eval(&procPostcondicion))
     end
-
     agregarAfterABufffer(nuevaInvariant)
   end
-
 end
 
 class PreconditionsNotMet < StandardError
