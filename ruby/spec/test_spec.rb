@@ -69,7 +69,7 @@ describe BeforeAndAfter do
 end
 
 describe Invariant do
-  describe '#Invariants' do
+  describe '#InicializoObjeto' do
     it 'Si al crear el objeto la invariant se cumple, no tira error' do
       class Guerrero
         attr_accessor :vida
@@ -97,6 +97,9 @@ describe Invariant do
     it 'Si al crear el objeto la invariant no se cumple, tira error' do
       expect { subject = Guerrero.new(-15) }.to raise_error(InvalidInvariant)
     end
+  end
+
+  describe '#InvariantEnMetodo' do
 
     it 'Si al ejecutar un método la invariant se cumple, no tira error' do
 
@@ -134,10 +137,10 @@ describe Invariant do
       expect { subject = Espadachin.new(1010) }.to raise_error(InvalidInvariant)
     end
   end
-end
+  end
 
 describe PreYPostCondiciones do
-  describe '#PrecondicionesYPostcondiciones' do
+  describe '#Precondiciones' do
     it 'Si el objeto cumple las precondiciones, ejecuta el metodo' do
       class Bibliotecario
         include Contratos
@@ -159,7 +162,6 @@ describe PreYPostCondiciones do
         def retarSinProblemas()
           @violencia  += @incremento_violencia * 40
         end
-
       end
 
       subject = Bibliotecario.new(100,0,0)
@@ -170,6 +172,9 @@ describe PreYPostCondiciones do
       subject = Bibliotecario.new(40,0,0)
       expect { subject.retarPersonaSinMatarla() }.to raise_error(PreconditionsNotMet)
     end
+  end
+
+  describe '#Precondiciones' do
 
     it 'Si el objeto cumple las postcondiciones ejecuta el método' do
       subject = Bibliotecario.new(100,0,0)
@@ -180,6 +185,9 @@ describe PreYPostCondiciones do
       subject = Bibliotecario.new(100,0,60)
       expect { subject.retarPersonaSinMatarla() }.to raise_error(PostconditionsNotMet)
     end
+  end
+
+  describe '#PrecondicionesYPostcondiciones' do
 
     it 'Método suelto no es afectado por precondiciones y postcondiciones anteriores' do
       subject = Bibliotecario.new(0,12220,455)
