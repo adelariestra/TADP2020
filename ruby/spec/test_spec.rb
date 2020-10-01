@@ -5,9 +5,9 @@ describe BeforeAndAfter do
   describe '#BeforeAndAfter' do
     it 'Al ejecutar un mensaje con before_and_after ejecuta procs definidos' do
       class ClaseTest
-        attr_reader :antes, :despues
         include Contratos
 
+        attr_reader :antes, :despues
 
         before_and_after_each_call(proc { @antes = 1 }, proc { @despues = 1 })
 
@@ -117,14 +117,13 @@ end
 
 describe Invariant do
   describe '#InicializoObjeto' do
-    it 'Si al crear el objeto la invariant se cumple, no tira error' do
+    before do
       class Guerrero
-
-        attr_accessor :vida
         include Contratos
+        attr_accessor :vida, :danio
 
+        invariant { danio >= 0}
         invariant { vida >= 0 }
-
         def initialize(cantidad_vida)
           @vida = cantidad_vida
         end
@@ -133,59 +132,29 @@ describe Invariant do
           @vida = -999
         end
 
-        def arakiriFallido
+        def arakiri_fallido
           @vida = 1
         end
 
       end
+    end
 
-      subject = Guerrero.new(15)
+    it 'Si al crear el objeto la invariant se cumple, no tira error' do
+      expect{ Guerrero.new(15) }.not_to raise_exception(InvalidInvariant)
     end
 
     it 'Si al crear el objeto la invariant no se cumple, tira error' do
-      expect { subject = Guerrero.new(-15) }.to raise_error(InvalidInvariant)
-    end
-  end
-
-  it 'Si al crear el objeto con los attr abajo del include y la invariant se cumple, no tira error' do
-    class Guerreroo
-
-      include Contratos
-      attr_accessor :vida
-
-      invariant { vida >= 0 }
-
-      def initialize(cantidad_vida)
-        @vida = cantidad_vida
-      end
-
-      def arakiri
-        @vida = -999
-      end
-
-      def arakiriFallido
-        @vida = 1
-      end
-
+      expect { Guerrero.new(-15) }.to raise_error(InvalidInvariant)
     end
 
-    subject = Guerreroo.new(15)
+    it 'Si al crear el objeto con los attr abajo del include y la invariant se cumple, no tira error' do
+      guerrero = Guerrero.new(15)
+      expect  { guerrero.arakiri}
+    end
   end
 
   describe '#InvariantEnMetodo' do
-
-    it 'Si al ejecutar un método la invariant se cumple, no tira error' do
-
-      subject = Guerrero.new(15)
-      subject.arakiriFallido
-    end
-
-    it 'Si al ejecutar un método la invariant no se cumple, tira error' do
-      subject = Guerrero.new(15)
-      expect { subject.arakiri }.to raise_error(InvalidInvariant)
-    end
-
-    it 'Al haber una clase con más de una invariant, ambas se ejecutan' do
+    before do
       class Espadachin
         attr_accessor :vida
 
@@ -194,104 +163,102 @@ describe Invariant do
         invariant { vida < 1000 }
 
         def initialize(cantidad_vida)
-          @vida = cantidad_vida
+          self.vida = cantidad_vida
         end
 
         def arakiri
-          @vida = -999
+          self.vida = -999
         end
 
         def arakiriFallido
-          @vida = 1
+          self.vida = 1
         end
-
       end
+    end
 
+    it 'Si al ejecutar un método la invariant se cumple, no tira error' do
+
+      subject = Guerrero.new(15)
+      subject.arakiri_fallido
+    end
+
+    it 'Si al ejecutar un método la invariant no se cumple, tira error' do
+      subject = Guerrero.new(15)
+      expect { subject.arakiri }.to raise_error(InvalidInvariant)
+    end
+
+    it 'Al haber una clase con más de una invariant, ambas se ejecutan' do
       expect { subject = Espadachin.new(1010) }.to raise_error(InvalidInvariant)
     end
   end
-  end
+end
 
 describe PreYPostCondiciones do
-  describe '#Precondiciones' do
-    it 'Si el objeto cumple las precondiciones, ejecuta el metodo' do
-      class Bibliotecario
-        include Contratos
-        attr_accessor :paciencia, :violencia, :incremento_violencia
+  before do
+    class Bibliotecario
+      include Contratos
 
-        def initialize(cant_paciencia,cant_violencia,cant_incremento_violencia)
-          @paciencia = cant_paciencia
-          @violencia = cant_violencia
-          @incremento_violencia = cant_incremento_violencia
-        end
+      attr_accessor :paciencia, :violencia, :incremento_violencia
 
-        pre { @paciencia > 80 }
-        post { @violencia < 50 }
-        def retarPersonaSinMatarla()
-          @violencia  += @incremento_violencia
-        end
-
-        # este método no se ve afectado por ninguna pre/post condición
-        def retarSinProblemas()
-          @violencia  += @incremento_violencia * 40
-        end
+      def initialize(cant_paciencia,cant_violencia,cant_incremento_violencia)
+        @paciencia = cant_paciencia
+        @violencia = cant_violencia
+        @incremento_violencia = cant_incremento_violencia
       end
 
+      pre { paciencia > 80 }
+      post { violencia < 50 }
+      def retar_persona_sin_matarla
+        self.violencia += incremento_violencia
+      end
+
+      # este método no se ve afectado por ninguna pre/post condición
+      def retar_sin_problemas
+        self.violencia += incremento_violencia * 40
+      end
+    end
+  end
+
+  context '#Precondiciones' do
+    it 'Si el objeto cumple las precondiciones, ejecuta el metodo' do
+
+
       subject = Bibliotecario.new(100,0,0)
-      subject.retarPersonaSinMatarla()
+      subject.retar_persona_sin_matarla
     end
 
     it 'Si el objeto NO cumple las precondiciones,lanza excepción' do
       subject = Bibliotecario.new(40,0,0)
-      expect { subject.retarPersonaSinMatarla() }.to raise_error(PreconditionsNotMet)
+      expect { subject.retar_persona_sin_matarla }.to raise_error(PreconditionsNotMet)
     end
   end
 
-  describe '#Precondiciones' do
-
+  context '#Precondiciones' do
     it 'Si el objeto cumple las postcondiciones ejecuta el método' do
       subject = Bibliotecario.new(100,0,0)
-      subject.retarPersonaSinMatarla()
+      subject.retar_persona_sin_matarla
     end
 
     it 'Si el objeto NO cumple las postcondiciones,lanza excepción' do
       subject = Bibliotecario.new(100,0,60)
-      expect { subject.retarPersonaSinMatarla() }.to raise_error(PostconditionsNotMet)
+      expect { subject.retar_persona_sin_matarla }.to raise_error(PostconditionsNotMet)
     end
   end
 
-  describe '#PrecondicionesYPostcondiciones' do
+  context '#PrecondicionesYPostcondiciones' do
 
     it 'Método suelto no es afectado por precondiciones y postcondiciones anteriores' do
       subject = Bibliotecario.new(0,12220,455)
-      subject.retarSinProblemas()
+      subject.retar_sin_problemas
     end
 
     it 'Deberia poder enviar mensajes y no solo acceder a las variables de instancia' do
-      class Bibliotecarioo
-        include Contratos
-        attr_accessor :paciencia, :violencia, :incremento_violencia
+      subject = Bibliotecario.new(100,0,0)
+      subject.retar_persona_sin_matarla
+      subject.paciencia = 50
 
-        def initialize(cant_paciencia,cant_violencia,cant_incremento_violencia)
-          @paciencia = cant_paciencia
-          @violencia = cant_violencia
-          @incremento_violencia = cant_incremento_violencia
-        end
-
-        pre { paciencia > 80 }
-        post { @violencia < 50 }
-        def retarPersonaSinMatarla()
-          @violencia  += @incremento_violencia
-        end
-
-        # este método no se ve afectado por ninguna pre/post condición
-        def retarSinProblemas()
-          @violencia  += @incremento_violencia * 40
-        end
-      end
-
-      subject = Bibliotecarioo.new(100,0,0)
-      subject.retarPersonaSinMatarla()
+      subject.retar_sin_problemas
+      subject.paciencia.should eq(50)
     end
   end
 end
