@@ -1,5 +1,6 @@
 module Invariant
   def invariant (&procInvariant)
+    puts procInvariant.inspect
     # convertir invariant a que si da false
     nuevaInvariant = proc do
       if (instance_eval(&procInvariant) == false)

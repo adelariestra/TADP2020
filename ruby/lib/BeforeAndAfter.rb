@@ -44,8 +44,10 @@ module BeforeAndAfter
   end
 
   def method_added(nombre_metodo)
-    # puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}"
+    puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}"
+    puts self.instance_variables
     inicializarListasBaA
+    #if(nombre_metodo != :initialize)
     chequear_actualizacion do # Método utilizado para evitar recursividad infinita
       metodo = instance_method(nombre_metodo)
 
@@ -57,19 +59,28 @@ module BeforeAndAfter
 
       # Redefinición del método para agregarle comportamiento
       define_method(nombre_metodo) do |*args, &bloque|
+        if(nombre_metodo == @metodoEnEjecucion)
+          return metodo.bind(self).call(*args, &bloque)
+        end
+        @metodoEnEjecucion = nombre_metodo
+
+        puts "METODO: #{nombre_metodo} --------------------------------------"
         # Precondiciones
         self.instance_eval(&bufferPrecondicion) unless (bufferPrecondicion.nil?)
 
         # Agregar metodos del before and after
         procsBefore.each{|procs| self.instance_eval &procs} # Ejecutar el proc en el contexto de self (osea de la clase)
-        metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la clase)
+        resultado = metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la clase)
         procsAfter.each{|procs| self.instance_eval &procs}
 
         # Postcondiciones
         self.instance_eval(&bufferPostcondicion) unless (bufferPostcondicion.nil?)
+        @metodoEnEjecucion = nil
+        return resultado #Lo guardamos para los métodos que retornan valores
       end
       limpiarBuffers() # Para que no afecte a los siguientes métodos
     end
+    #end
   end
 
   def chequear_actualizacion
