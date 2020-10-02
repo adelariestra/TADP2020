@@ -3,19 +3,20 @@
 describe BeforeAndAfter do
 
   describe '#BeforeAndAfter' do
-    it 'Al ejecutar un mensaje con before_and_after ejecuta procs definidos' do
+    before do
       class ClaseTest
-        attr_reader :antes, :despues
+        attr_reader :antes, :despues, :medio
         include Contratos
 
 
         before_and_after_each_call(proc { @antes = 1 }, proc { @despues = 1 })
 
         def mensaje_test
-          # test
+          @medio = 1
         end
       end
-
+    end
+    it 'Al ejecutar un mensaje con before_and_after ejecuta procs definidos' do
       subject = ClaseTest.new
       subject.mensaje_test
 
@@ -24,19 +25,7 @@ describe BeforeAndAfter do
     end
 
     it 'Al tener un before_and_after, el mensaje envidado se ejecuta correctamente' do
-      class ClaseTestt
-        attr_reader :antes, :medio, :despues
-        include Contratos
-
-        before_and_after_each_call(proc { @antes = 1 }, proc { @despues = 1 })
-
-        def mensaje_test
-          @medio = 1
-        end
-
-      end
-
-      subject = ClaseTestt.new
+      subject = ClaseTest.new
       subject.mensaje_test
 
       expect(subject.antes).to eq(1)
@@ -45,20 +34,8 @@ describe BeforeAndAfter do
     end
 
     it 'Al tener dos before_and_after en la misma clase ejecuta procs definidos' do
-      class ClaseTesttt
-        attr_reader :antes, :medio, :despues
-        include Contratos
-
-        before_and_after_each_call(proc { @antes = 1 }, proc { @despues = 1 })
-
-        def mensaje_test
-          @medio = 1
-        end
-
-        before_and_after_each_call(proc { @antes += 1 }, proc { @despues += 1 })
-      end
-
-      subject = ClaseTesttt.new
+      ClaseTest.before_and_after_each_call(proc { @antes += 1 }, proc { @despues += 1 })
+      subject = ClaseTest.new
       subject.mensaje_test
 
       expect(subject.antes).to eq(2)
@@ -67,7 +44,7 @@ describe BeforeAndAfter do
     end
 
     it 'Podemos definir los attr después del include' do
-      class ClaseTestttt
+      class ClaseTest2
 
         include Contratos
         attr_reader :antes, :despues
@@ -79,66 +56,42 @@ describe BeforeAndAfter do
         end
       end
 
-      subject = ClaseTestttt.new
-      subject.mensaje_test
-
-      expect(subject.antes).to eq(1)
-      #expect(subject.despues).to eq(1)
-    end
-
-    it 'Si alguno de estos procs modifica algun valor sobre el objeto deberia funcionar igual' do
-      class ClaseTesttttt
-        attr_reader :antes, :despues
-
-        def initialize()
-          @antes = 0
-          @despues = 0
-        end
-
-        include Contratos
-
-
-        before_and_after_each_call(proc { @antes += 1 }, proc { @despues += 1 })
-
-        def mensaje_test
-          # test
-        end
-      end
-
-      subject = ClaseTesttttt.new
+      subject = ClaseTest2.new
       subject.mensaje_test
 
       expect(subject.antes).to eq(1)
       expect(subject.despues).to eq(1)
     end
-
   end
 end
 
 describe Invariant do
-  describe '#InicializoObjeto' do
-    it 'Si al crear el objeto la invariant se cumple, no tira error' do
-      class Guerrero
+  before do
+    class Guerrero
 
-        attr_accessor :vida
-        include Contratos
+      attr_accessor :vida
+      include Contratos
 
-        invariant { vida >= 0 }
+      invariant { vida >= 0 }
 
-        def initialize(cantidad_vida)
-          @vida = cantidad_vida
-        end
-
-        def arakiri
-          @vida = -999
-        end
-
-        def arakiri_fallido
-          @vida = 1
-        end
-
+      def initialize(cantidad_vida)
+        @vida = cantidad_vida
       end
 
+      def arakiri
+        @vida = -999
+      end
+
+      def arakiri_fallido
+        @vida = 1
+      end
+
+    end
+  end
+
+  describe '#InicializoObjeto' do
+
+    it 'Si al crear el objeto la invariant se cumple, no tira error' do
       subject = Guerrero.new(15)
     end
 
@@ -148,7 +101,7 @@ describe Invariant do
   end
 
   it 'Si al crear el objeto con los attr abajo del include y la invariant se cumple, no tira error' do
-    class Guerreroo
+    class Guerrero2
 
       include Contratos
       attr_accessor :vida
@@ -169,7 +122,7 @@ describe Invariant do
 
     end
 
-    subject = Guerreroo.new(15)
+    subject = Guerrero2.new(15)
   end
 
   describe '#InvariantEnMetodo' do
@@ -208,6 +161,32 @@ describe Invariant do
       end
 
       expect { subject = Espadachin.new(1010) }.to raise_error(InvalidInvariant)
+    end
+
+    it 'Al haber una clase con más de una invariant con distintos métodos, ambas se ejecutan' do
+      class Espadachin2
+        attr_accessor :vida, :danio
+
+        include Contratos
+        invariant { vida >= 0 }
+        invariant { danio >= 0 }
+
+        def initialize(cantidad_vida, cantidad_danio)
+          @vida = cantidad_vida
+          @danio = cantidad_danio
+        end
+
+        def arakiri
+          @vida = -999
+        end
+
+        def arakiri_fallido
+          @vida = 1
+        end
+
+      end
+
+      expect { subject = Espadachin2.new(1010, 2011) }.to raise_error(InvalidInvariant)
     end
   end
   end
