@@ -8,7 +8,7 @@ module Invariant
 
     # redefinir cualquier metodo existente para que en el after tenga la invariant reconvertida
     # como el método initialize se agrega después de la ejecución, tambien se overridea
-    agregar_after(nueva_invariante)
+    agregar_invariante(nueva_invariante)
   end
 end
 

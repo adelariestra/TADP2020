@@ -1,6 +1,7 @@
 module BeforeAndAfter
   attr_accessor :procs_before, :procs_after
   attr_accessor :buffer_precondicion, :buffer_postcondicion
+  attr_accessor :invariantes
 
   def before_and_after_each_call(proc_before, proc_after)
     inicializar_listas_baA
@@ -9,12 +10,10 @@ module BeforeAndAfter
   end
 
   def agregarBeforeABufffer(proc_before)
-
     @buffer_precondicion = proc_before
   end
 
   def agregarAfterABufffer(proc_after)
-
     @buffer_postcondicion = proc_after
   end
 
@@ -23,16 +22,17 @@ module BeforeAndAfter
     @buffer_postcondicion = nil
   end
 
-  #TODO: Se sigue usando??
-  def agregar_before(proc_before)
-    inicializar_listas_baA
-    @procs_before << proc_before
+  def agregar_invariante(invariante)
+    @invariantes ||= []
+    @invariantes << invariante
   end
 
-  #TODO: Se sigue usando??
-  def agregar_after(proc_after)
-    inicializar_listas_baA
-    @procs_after << proc_after
+  def all_invariants
+    if @invariantes.nil?
+      []
+    else
+      @invariantes
+    end
   end
 
   def inicializar_listas_baA
@@ -56,6 +56,7 @@ module BeforeAndAfter
       procs_after = @procs_after
       buffer_precondicion = @buffer_precondicion
       buffer_postcondicion = @buffer_postcondicion
+      invariantes = all_invariants
 
       # Redefinición del método para agregarle comportamiento
       define_method(nombre_metodo) do |*args, &bloque|
@@ -72,6 +73,9 @@ module BeforeAndAfter
         procs_before.each { |procs| self.instance_eval &procs } # Ejecutar el proc en el contexto de self (osea de la clase)
         resultado = metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la instancia)..
         procs_after.each { |procs| self.instance_eval &procs }
+
+        # Invariantes
+        invariantes.each{|invariante| self.instance_eval &invariante} #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
 
         # Postcondiciones
         self.instance_eval(&buffer_postcondicion) unless (buffer_postcondicion.nil?)
