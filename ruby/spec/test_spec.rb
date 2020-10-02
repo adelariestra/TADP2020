@@ -11,13 +11,13 @@ describe BeforeAndAfter do
 
         before_and_after_each_call(proc { @antes = 1 }, proc { @despues = 1 })
 
-        def mensajeTest
+        def mensaje_test
           # test
         end
       end
 
       subject = ClaseTest.new
-      subject.mensajeTest
+      subject.mensaje_test
 
       expect(subject.antes).to eq(1)
       expect(subject.despues).to eq(1)
@@ -30,14 +30,14 @@ describe BeforeAndAfter do
 
         before_and_after_each_call(proc { @antes = 1 }, proc { @despues = 1 })
 
-        def mensajeTest
+        def mensaje_test
           @medio = 1
         end
 
       end
 
       subject = ClaseTestt.new
-      subject.mensajeTest
+      subject.mensaje_test
 
       expect(subject.antes).to eq(1)
       expect(subject.medio).to eq(1)
@@ -51,7 +51,7 @@ describe BeforeAndAfter do
 
         before_and_after_each_call(proc { @antes = 1 }, proc { @despues = 1 })
 
-        def mensajeTest
+        def mensaje_test
           @medio = 1
         end
 
@@ -59,7 +59,7 @@ describe BeforeAndAfter do
       end
 
       subject = ClaseTesttt.new
-      subject.mensajeTest
+      subject.mensaje_test
 
       expect(subject.antes).to eq(2)
       expect(subject.medio).to eq(1)
@@ -74,13 +74,13 @@ describe BeforeAndAfter do
 
         before_and_after_each_call(proc { @antes = 1 }, proc { @despues = 1 })
 
-        def mensajeTest
+        def mensaje_test
           # test
         end
       end
 
       subject = ClaseTestttt.new
-      subject.mensajeTest
+      subject.mensaje_test
 
       expect(subject.antes).to eq(1)
       #expect(subject.despues).to eq(1)
@@ -100,13 +100,13 @@ describe BeforeAndAfter do
 
         before_and_after_each_call(proc { @antes += 1 }, proc { @despues += 1 })
 
-        def mensajeTest
+        def mensaje_test
           # test
         end
       end
 
       subject = ClaseTesttttt.new
-      subject.mensajeTest
+      subject.mensaje_test
 
       expect(subject.antes).to eq(1)
       expect(subject.despues).to eq(1)
@@ -133,7 +133,7 @@ describe Invariant do
           @vida = -999
         end
 
-        def arakiriFallido
+        def arakiri_fallido
           @vida = 1
         end
 
@@ -163,7 +163,7 @@ describe Invariant do
         @vida = -999
       end
 
-      def arakiriFallido
+      def arakiri_fallido
         @vida = 1
       end
 
@@ -177,7 +177,7 @@ describe Invariant do
     it 'Si al ejecutar un método la invariant se cumple, no tira error' do
 
       subject = Guerrero.new(15)
-      subject.arakiriFallido
+      subject.arakiri_fallido
     end
 
     it 'Si al ejecutar un método la invariant no se cumple, tira error' do
@@ -201,7 +201,7 @@ describe Invariant do
           @vida = -999
         end
 
-        def arakiriFallido
+        def arakiri_fallido
           @vida = 1
         end
 
@@ -227,23 +227,23 @@ describe PreYPostCondiciones do
 
         pre { @paciencia > 80 }
         post { @violencia < 50 }
-        def retarPersonaSinMatarla()
+        def retar_persona_sin_matarla()
           @violencia  += @incremento_violencia
         end
 
         # este método no se ve afectado por ninguna pre/post condición
-        def retarSinProblemas()
+        def retar_sin_problemas()
           @violencia  += @incremento_violencia * 40
         end
       end
 
       subject = Bibliotecario.new(100,0,0)
-      subject.retarPersonaSinMatarla()
+      subject.retar_persona_sin_matarla()
     end
 
     it 'Si el objeto NO cumple las precondiciones,lanza excepción' do
       subject = Bibliotecario.new(40,0,0)
-      expect { subject.retarPersonaSinMatarla() }.to raise_error(PreconditionsNotMet)
+      expect { subject.retar_persona_sin_matarla() }.to raise_error(PreconditionsNotMet)
     end
   end
 
@@ -251,12 +251,12 @@ describe PreYPostCondiciones do
 
     it 'Si el objeto cumple las postcondiciones ejecuta el método' do
       subject = Bibliotecario.new(100,0,0)
-      subject.retarPersonaSinMatarla()
+      subject.retar_persona_sin_matarla()
     end
 
     it 'Si el objeto NO cumple las postcondiciones,lanza excepción' do
       subject = Bibliotecario.new(100,0,60)
-      expect { subject.retarPersonaSinMatarla() }.to raise_error(PostconditionsNotMet)
+      expect { subject.retar_persona_sin_matarla() }.to raise_error(PostconditionsNotMet)
     end
   end
 
@@ -264,7 +264,7 @@ describe PreYPostCondiciones do
 
     it 'Método suelto no es afectado por precondiciones y postcondiciones anteriores' do
       subject = Bibliotecario.new(0,12220,455)
-      subject.retarSinProblemas()
+      subject.retar_sin_problemas()
     end
 
     it 'Deberia poder enviar mensajes y no solo acceder a las variables de instancia' do
@@ -280,18 +280,18 @@ describe PreYPostCondiciones do
 
         pre { paciencia > 80 }
         post { @violencia < 50 }
-        def retarPersonaSinMatarla()
+        def retar_persona_sin_matarla()
           @violencia  += @incremento_violencia
         end
 
         # este método no se ve afectado por ninguna pre/post condición
-        def retarSinProblemas()
+        def retar_sin_problemas()
           @violencia  += @incremento_violencia * 40
         end
       end
 
       subject = Bibliotecarioo.new(100,0,0)
-      subject.retarPersonaSinMatarla()
+      subject.retar_persona_sin_matarla()
     end
   end
 end
