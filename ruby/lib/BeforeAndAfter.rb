@@ -60,9 +60,7 @@ module BeforeAndAfter
 
       # Redefinición del método para agregarle comportamiento
       define_method(nombre_metodo) do |*args, &bloque|
-        if !@__evitar_recursividad__.nil?
-          return metodo.bind(self).call(*args, &bloque)
-        end
+        return metodo.bind(self).call(*args, &bloque) unless @__evitar_recursividad__.nil?
         @__evitar_recursividad__ = 0
 
         puts "METODO: #{nombre_metodo} --------------------------------------"
