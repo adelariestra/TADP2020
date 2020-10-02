@@ -203,9 +203,10 @@ describe Invariant do
 
     it 'Al haber una clase con más de una invariant con distintos métodos, ambas se ejecutan' do
       class Espadachin2
-        attr_accessor :vida, :danio
 
         include Contratos
+        attr_accessor :vida, :danio
+
         invariant { vida >= 0 }
         invariant { danio >= 0 }
 

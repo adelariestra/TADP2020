@@ -59,10 +59,12 @@ module BeforeAndAfter
       define_method(nombre_metodo) do |*args, &bloque|
         puts "Analizo rec METODO: #{nombre_metodo} --------------------------------------"
         #  RECURSIVIDAD
-        if (@__nombre_metodo_anterior__ == nombre_metodo)
+        if (!@__metodos_anteriores__.nil? and @__metodos_anteriores__.include? nombre_metodo)
           return metodo.bind(self).call(*args, &bloque)
         end
-        @__nombre_metodo_anterior__ = nombre_metodo
+
+        @__metodos_anteriores__ ||= []
+        @__metodos_anteriores__ << nombre_metodo
 
         puts "Ej Contrato METODO: #{nombre_metodo} --------------------------------------"
         # Precondicionesa
@@ -80,7 +82,7 @@ module BeforeAndAfter
         self.instance_eval(&(post)) unless (post.nil?)
 
         # RECURSIVIDAD
-        @__nombre_metodo_anterior__ = ''
+        @__metodos_anteriores__ = []
 
         resultado #Lo guardamos para los métodos que retornan valores
       end
