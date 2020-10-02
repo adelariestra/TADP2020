@@ -70,7 +70,7 @@ module BeforeAndAfter
 
         # Agregar metodos del before and after
         procs_before.each { |procs| self.instance_eval &procs } # Ejecutar el proc en el contexto de self (osea de la clase)
-        resultado = metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la clase).. TODO: de la clase o la instancia??
+        resultado = metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la instancia)..
         procs_after.each { |procs| self.instance_eval &procs }
 
         # Postcondiciones
