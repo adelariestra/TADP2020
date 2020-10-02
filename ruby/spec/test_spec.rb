@@ -8,7 +8,6 @@ describe BeforeAndAfter do
         attr_reader :antes, :despues, :medio
         include Contratos
 
-
         before_and_after_each_call(proc { @antes = 1 }, proc { @despues = 1 })
 
         def mensaje_test
@@ -196,30 +195,31 @@ describe Invariant do
   end
 
 describe PreYPostCondiciones do
-  describe '#Precondiciones' do
-    it 'Si el objeto cumple las precondiciones, ejecuta el metodo' do
-      class Bibliotecario
-        include Contratos
-        attr_accessor :paciencia, :violencia, :incremento_violencia
+  before do
+    class Bibliotecario
+      include Contratos
+      attr_accessor :paciencia, :violencia, :incremento_violencia
 
-        def initialize(cant_paciencia,cant_violencia,cant_incremento_violencia)
-          @paciencia = cant_paciencia
-          @violencia = cant_violencia
-          @incremento_violencia = cant_incremento_violencia
-        end
-
-        pre { @paciencia > 80 }
-        post { @violencia < 50 }
-        def retar_persona_sin_matarla()
-          @violencia  += @incremento_violencia
-        end
-
-        # este método no se ve afectado por ninguna pre/post condición
-        def retar_sin_problemas()
-          @violencia  += @incremento_violencia * 40
-        end
+      def initialize(cant_paciencia,cant_violencia,cant_incremento_violencia)
+        @paciencia = cant_paciencia
+        @violencia = cant_violencia
+        @incremento_violencia = cant_incremento_violencia
       end
 
+      pre { @paciencia > 80 }
+      post { @violencia < 50 }
+      def retar_persona_sin_matarla()
+        @violencia  += @incremento_violencia
+      end
+
+      # este método no se ve afectado por ninguna pre/post condición
+      def retar_sin_problemas()
+        @violencia  += @incremento_violencia * 40
+      end
+    end
+  end
+  describe '#Precondiciones' do
+    it 'Si el objeto cumple las precondiciones, ejecuta el metodo' do
       subject = Bibliotecario.new(100,0,0)
       subject.retar_persona_sin_matarla()
     end

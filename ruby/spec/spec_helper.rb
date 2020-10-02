@@ -7,4 +7,5 @@ require_relative '../lib/BeforeAndAfter'
 require_relative '../lib/Contratos'
 require_relative '../lib/Invariant'
 require_relative '../lib/PreYPostCondiciones'
+require_relative '../lib/PrePost'
 

@@ -5,7 +5,7 @@ module PreYPostCondiciones
       raise(PreconditionsNotMet.new) unless (instance_eval(&proc_precondicion))
     end
 
-    agregarBeforeABufffer(nueva_invariante)
+    agregar_pre_buffer(nueva_invariante)
   end
 
   def post (&proc_postcondicion)
@@ -13,7 +13,7 @@ module PreYPostCondiciones
     nueva_invariant = proc do
       raise(PostconditionsNotMet.new) unless (instance_eval(&proc_postcondicion))
     end
-    agregarAfterABufffer(nueva_invariant)
+    agregar_post_buffer(nueva_invariant)
   end
 end
 

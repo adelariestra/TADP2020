@@ -3,27 +3,32 @@ module BeforeAndAfter
   attr_accessor :buffer_precondicion, :buffer_postcondicion
   attr_accessor :invariantes
 
+  def self.extended(klass)
+    klass.inicializar_listas
+  end
+
+  def inicializar_listas
+    puts "inicializadas"
+    @procs_before ||= []
+    @procs_after ||= []
+    @invariantes ||= []
+    @buffer_pre_post ||= PrePost.new(nil,nil)
+  end
+
   def before_and_after_each_call(proc_before, proc_after)
-    inicializar_listas_baA
     @procs_before << proc_before
     @procs_after << proc_after
   end
 
-  def agregarBeforeABufffer(proc_before)
-    @buffer_precondicion = proc_before
+  def agregar_pre_buffer(proc_before)
+    @buffer_pre_post.pre =proc_before
   end
 
-  def agregarAfterABufffer(proc_after)
-    @buffer_postcondicion = proc_after
-  end
-
-  def limpiar_buffers()
-    @buffer_precondicion = nil
-    @buffer_postcondicion = nil
+  def agregar_post_buffer(proc_after)
+    @buffer_pre_post.post = proc_after
   end
 
   def agregar_invariante(invariante)
-    @invariantes ||= []
     @invariantes << invariante
   end
 
@@ -35,28 +40,20 @@ module BeforeAndAfter
     end
   end
 
-  def inicializar_listas_baA
-    return unless @procs_before.nil?
-    @procs_before = []
-    @procs_after = []
-  end
-
   def method_added(nombre_metodo)
-    puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}"
-    puts self.instance_variables
-    inicializar_listas_baA #TODO: deberia ser cuando se incluye el modulo(?)
+    #puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}"
+    #puts self.instance_variables
 
     mutex_subrescritura do
       # Método utilizado para evitar recursividad infinita
       metodo = instance_method(nombre_metodo)
 
       # Hace falta guardar en locales porque las utilizaremos dentro del contexto del proc, el cual no es el mismo que el de la instancia
-      # TODO: podrian guardarlo en un objeto a las precondiciones y postcondiciones
       procs_before = @procs_before
       procs_after = @procs_after
-      buffer_precondicion = @buffer_precondicion
-      buffer_postcondicion = @buffer_postcondicion
-      invariantes = all_invariants
+      pre = @buffer_pre_post.pre
+      post = @buffer_pre_post.post
+      invariantes = @invariantes
 
       # Redefinición del método para agregarle comportamiento
       define_method(nombre_metodo) do |*args, &bloque|
@@ -65,7 +62,7 @@ module BeforeAndAfter
 
         puts "METODO: #{nombre_metodo} --------------------------------------"
         # Precondiciones
-        self.instance_eval(&buffer_precondicion) unless (buffer_precondicion.nil?)
+        self.instance_eval(&(pre)) unless (pre.nil?)
 
         # Agregar metodos del before and after
         procs_before.each { |procs| self.instance_eval &procs } # Ejecutar el proc en el contexto de self (osea de la clase)
@@ -76,12 +73,12 @@ module BeforeAndAfter
         invariantes.each{|invariante| self.instance_eval &invariante} #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
 
         # Postcondiciones
-        self.instance_eval(&buffer_postcondicion) unless (buffer_postcondicion.nil?)
+        self.instance_eval(&(post)) unless (post.nil?)
 
         @__evitar_recursividad__ = nil
         resultado #Lo guardamos para los métodos que retornan valores
       end
-      limpiar_buffers # Para que no afecte a los siguientes métodos
+      @buffer_pre_post.limpiar # Para que no afecte a los siguientes métodos
     end
     #end
   end
