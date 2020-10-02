@@ -51,7 +51,7 @@ describe BeforeAndAfter do
 
         def mensaje_multiple
           mensaje_test
-          mensaje_test2
+          mensaje_test
         end
       end
 

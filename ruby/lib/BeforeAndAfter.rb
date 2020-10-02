@@ -80,7 +80,7 @@ module BeforeAndAfter
         self.instance_eval(&(post)) unless (post.nil?)
 
         # RECURSIVIDAD
-        @__contador_invariantes__ = 0
+        @__nombre_metodo_anterior__ = ''
 
         resultado #Lo guardamos para los métodos que retornan valores
       end
