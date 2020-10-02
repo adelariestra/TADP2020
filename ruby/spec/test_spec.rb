@@ -186,7 +186,11 @@ describe Invariant do
 
       end
 
-      expect { subject = Espadachin2.new(1010, 2011) }.to raise_error(InvalidInvariant)
+      expect { subject = Espadachin2.new(1010, 2011) }
+    end
+
+    it 'Al haber una clase con más de una invariant con distintos métodos y una no cumplirse, debería fallar' do
+      expect { subject = Espadachin2.new(1010, -2011) }.to raise_error(InvalidInvariant)
     end
   end
   end

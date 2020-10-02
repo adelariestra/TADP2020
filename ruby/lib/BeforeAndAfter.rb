@@ -60,10 +60,10 @@ module BeforeAndAfter
 
       # Redefinición del método para agregarle comportamiento
       define_method(nombre_metodo) do |*args, &bloque|
-        if nombre_metodo == @metodo_en_ejecucion
+        if !@__evitar_recursividad__.nil?
           return metodo.bind(self).call(*args, &bloque)
         end
-        @metodo_en_ejecucion = nombre_metodo
+        @__evitar_recursividad__ = 0
 
         puts "METODO: #{nombre_metodo} --------------------------------------"
         # Precondiciones
@@ -80,7 +80,7 @@ module BeforeAndAfter
         # Postcondiciones
         self.instance_eval(&buffer_postcondicion) unless (buffer_postcondicion.nil?)
 
-        @metodo_en_ejecucion = nil
+        @__evitar_recursividad__ = nil
         resultado #Lo guardamos para los métodos que retornan valores
       end
       limpiar_buffers # Para que no afecte a los siguientes métodos
