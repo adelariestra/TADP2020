@@ -57,11 +57,15 @@ module BeforeAndAfter
 
       # Redefinición del método para agregarle comportamiento
       define_method(nombre_metodo) do |*args, &bloque|
-        return metodo.bind(self).call(*args, &bloque) unless @__evitar_recursividad__.nil?
-        @__evitar_recursividad__ = 0
+        puts "Analizo rec METODO: #{nombre_metodo} --------------------------------------"
+        #  RECURSIVIDAD
+        if (@__nombre_metodo_anterior__ == nombre_metodo)
+          return metodo.bind(self).call(*args, &bloque)
+        end
+        @__nombre_metodo_anterior__ = nombre_metodo
 
-        puts "METODO: #{nombre_metodo} --------------------------------------"
-        # Precondiciones
+        puts "Ej Contrato METODO: #{nombre_metodo} --------------------------------------"
+        # Precondicionesa
         self.instance_eval(&(pre)) unless (pre.nil?)
 
         # Agregar metodos del before and after
@@ -75,7 +79,9 @@ module BeforeAndAfter
         # Postcondiciones
         self.instance_eval(&(post)) unless (post.nil?)
 
-        @__evitar_recursividad__ = nil
+        # RECURSIVIDAD
+        @__contador_invariantes__ = 0
+
         resultado #Lo guardamos para los métodos que retornan valores
       end
       @buffer_pre_post.limpiar # Para que no afecte a los siguientes métodos

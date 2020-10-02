@@ -23,6 +23,45 @@ describe BeforeAndAfter do
       expect(subject.despues).to eq(1)
     end
 
+    it 'Al ejecutar un mensaje que llama a otros de self, ejecuta los procs por cada uno' do
+      class ClaseTest3
+        attr_reader :antes, :despues, :medio
+        def initialize
+          @antes = 0
+          @despues = 0
+        end
+
+        include Contratos
+
+        before_and_after_each_call(proc do
+          @antes ||= 0
+          @antes += 1
+        end, proc do
+          @despues||= 0
+          @despues += 1
+        end)
+
+        def mensaje_test
+          puts "ejecutando"
+        end
+
+        def mensaje_test2
+          puts "ejecutando"
+        end
+
+        def mensaje_multiple
+          mensaje_test
+          mensaje_test2
+        end
+      end
+
+      subject = ClaseTest3.new
+      subject.mensaje_multiple
+
+      expect(subject.antes).to eq(3)
+      expect(subject.despues).to eq(3)
+    end
+
     it 'Al tener un before_and_after, el mensaje envidado se ejecuta correctamente' do
       subject = ClaseTest.new
       subject.mensaje_test
