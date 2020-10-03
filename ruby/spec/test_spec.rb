@@ -225,7 +225,9 @@ describe Invariant do
 
       end
 
-      expect { subject = Espadachin2.new(1010, 2011) }
+      subject = Espadachin2.new(1010, 2011)
+      subject.arakiri_fallido
+      expect(subject.vida).to eq(1)
     end
 
     it 'Al haber una clase con más de una invariant con distintos métodos y una no cumplirse, debería fallar' do
