@@ -8,5 +8,5 @@ require_relative '../lib/Contratos'
 require_relative '../lib/Invariant'
 require_relative '../lib/PreYPostCondiciones'
 require_relative '../lib/PrePost'
-require_relative '../lib/Clonador'
+require_relative '../lib/EvaluadorContratos'
 

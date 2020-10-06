@@ -1,6 +1,5 @@
 module BeforeAndAfter
   attr_accessor :procs_before, :procs_after
-  attr_accessor :buffer_precondicion, :buffer_postcondicion
   attr_accessor :invariantes
 
   def self.extended(klass)
@@ -32,21 +31,13 @@ module BeforeAndAfter
     @invariantes << invariante
   end
 
-  def all_invariants
-    if @invariantes.nil?
-      []
-    else
-      @invariantes
-    end
-  end
-
   def method_added(nombre_metodo)
     #puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}"
     #puts self.instance_variables
 
     mutex_subrescritura do
       # Método utilizado para evitar recursividad infinita
-      metodo = instance_method(nombre_metodo)
+      metodo = instance_method(nombre_metodo) # Obtengo unbound method de la instancia con el nombre especificado
 
       # Hace falta guardar en locales porque las utilizaremos dentro del contexto del proc, el cual no es el mismo que el de la instancia
       procs_before = @procs_before
@@ -54,26 +45,30 @@ module BeforeAndAfter
       pre = @buffer_pre_post.pre
       post = @buffer_pre_post.post
       invariantes = @invariantes
-      clonador = Clonador.new
-      nombres_parametros = metodo.parameters.map { |parametro| parametro[1] }
+
+      clonador = EvaluadorContratos.new
+
+      nombres_parametros = metodo.parameters.map { |parametro| parametro[1] } # Obtener nombres de parámetros del método y mapearlo para solo quedar con los nombres (ignorar el "obligatorio" de la tupla)
 
       # Redefinición del método para agregarle comportamiento
       define_method(nombre_metodo) do |*args, &bloque|
-        puts "Analizo rec METODO: #{nombre_metodo} --------------------------------------"
-        @is_clone ||= false
-        parametros = nombres_parametros.zip(args)
+        # DEBUG: puts "Analizo rec METODO: #{nombre_metodo} --------------------------------------"
 
-        if (@is_clone)
+        @is_clone ||= false # Si esta nil lo setea en false
+
+        if (@is_clone)  # Se ignoran invariantes y prepost.
           procs_before.each { |procs| self.instance_eval &procs }
           resultado = metodo.bind(self).call(*args, &bloque)
           procs_after.each { |procs| self.instance_eval &procs }
         else
-
+          parametros = nombres_parametros.zip(args) # Agrupar los nombres de argumentos con sus valores en una lista de tuplas.
           # Precondiciones
           clonador.evaluar_precondicion_en_clon(self, pre, parametros)
+          # se pasan los parametroos para poder ejecutar condiciones que los utilicen
+          # se evalua sobre un clon para que las condiciones y befores de las condiciones no afecten al objeto original.
 
           # Agregar metodos del before and after
-          procs_before.each { |procs| self.instance_eval &procs } # Ejecutar el proc en el contexto de self (osea de la clase)
+          procs_before.each { |procs| self.instance_eval &procs } # Ejecutar el proc en el contexto de self (osea de la instancia)
           resultado = metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la instancia)..
           procs_after.each { |procs| self.instance_eval &procs }
 

@@ -1,4 +1,4 @@
-class Clonador
+class EvaluadorContratos
   def evaluar_invariantes_en_clon(instancia_original, invariantes)
       invariantes.each do |invariante|
         clon = crear_clon(instancia_original)
