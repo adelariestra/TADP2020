@@ -90,7 +90,12 @@ module BeforeAndAfter
     return if Thread.current[:__actualizando__] # si ya esta overrideando skipeo
 
     Thread.current[:__actualizando__] = true
-    yield if block_given? # ejecutar el bloque entrante
+    begin
+      yield if block_given? # ejecutar el bloque entrante
+    rescue StandardError
+      Thread.current[:__actualizando__] = false
+      raise
+    end
     Thread.current[:__actualizando__] = false
   end
 end
