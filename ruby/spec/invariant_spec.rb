@@ -169,4 +169,3 @@ describe Invariant do
     subject = Gladiador.new(20)
   end
 end
-

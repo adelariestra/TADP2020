@@ -66,7 +66,7 @@ module BeforeAndAfter
       define_method(nombre_metodo) do |*args, &bloque|
         # DEBUG: puts "Analizo rec METODO: #{nombre_metodo} --------------------------------------"
 
-        if(accessors.include? nombre_metodo) # si es un accessor...
+        if accessors.include? nombre_metodo # si es un accessor...
           resultado = metodo.bind(self).call(*args, &bloque)
           puts "Era un accessor! #{nombre_metodo}"
           return resultado
@@ -74,10 +74,10 @@ module BeforeAndAfter
 
         @is_clone ||= false # Si esta nil lo setea en false
 
-        if (@is_clone) # Se ignoran invariantes y prepost.
-          procs_before.each { |procs| self.instance_eval &procs }
+        if @is_clone # Se ignoran invariantes y prepost.
+          procs_before.each { |procs| instance_eval(&procs) }
           resultado = metodo.bind(self).call(*args, &bloque)
-          procs_after.each { |procs| self.instance_eval &procs }
+          procs_after.each { |procs| instance_eval(&procs) }
         else
           parametros = nombres_parametros.zip(args) # Agrupar los nombres de argumentos con sus valores en una lista de tuplas.
           # Precondiciones
@@ -86,9 +86,9 @@ module BeforeAndAfter
           # se evalua sobre un clon para que las condiciones y befores de las condiciones no afecten al objeto original.
 
           # Agregar metodos del before and after
-          procs_before.each { |procs| self.instance_eval &procs } # Ejecutar el proc en el contexto de self (osea de la instancia)
+          procs_before.each { |procs| instance_eval(&procs) } # Ejecutar el proc en el contexto de self (osea de la instancia)
           resultado = metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la instancia)..
-          procs_after.each { |procs| self.instance_eval &procs }
+          procs_after.each { |procs| instance_eval(&procs) }
 
           # Invariantes
           clonador.evaluar_invariantes_en_clon(self, invariantes) #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
@@ -96,11 +96,10 @@ module BeforeAndAfter
           # Postcondiciones
           clonador.evaluar_postcondicion_en_clon(self, post, parametros, resultado)
         end
-        resultado #Lo guardamos para los métodos que retornan valores
+        resultado # Lo guardamos para los métodos que retornan valores
       end
       @buffer_pre_post.limpiar # Para que no afecte a los siguientes métodos
     end
-    #end
   end
 
   def mutex_subrescritura
