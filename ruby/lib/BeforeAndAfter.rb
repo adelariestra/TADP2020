@@ -54,6 +54,7 @@ module BeforeAndAfter
       pre = @buffer_pre_post.pre
       post = @buffer_pre_post.post
       invariantes = @invariantes
+      clonador = Clonador.new
       #parametros = metodo.parameters.map { |parametro| parametro[1] }
 
       # Redefinición del método para agregarle comportamiento
@@ -63,15 +64,13 @@ module BeforeAndAfter
         #puts "ZIP: #{parametros.zip(args)}"
 
         if (@is_clone)
-          puts "Soy un clon"
           procs_before.each { |procs| self.instance_eval &procs }
           resultado = metodo.bind(self).call(*args, &bloque)
           procs_after.each { |procs| self.instance_eval &procs }
         else
-          clon_pre_ejecucion = self.clone
-          clon_pre_ejecucion.instance_variable_set(:@is_clone, true)
+
           # Precondiciones
-          clon_pre_ejecucion.instance_eval(&(pre)) unless (pre.nil?)
+          clonador.evaluar_en_clon(self,pre)
 
           # Agregar metodos del before and after
           procs_before.each { |procs| self.instance_eval &procs } # Ejecutar el proc en el contexto de self (osea de la clase)
@@ -79,16 +78,10 @@ module BeforeAndAfter
           procs_after.each { |procs| self.instance_eval &procs }
 
           # Invariantes
-          invariantes.each do |invariante|
-            clon = self.clone
-            clon.instance_variable_set(:@is_clone, true)
-            clon.instance_eval &invariante
-          end #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
+          clonador.evaluar_en_clon(self,invariantes) #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
 
-          clon_post_ejecucion = self.clone
-          clon_post_ejecucion.instance_variable_set(:@is_clone, true)
           # Postcondiciones
-          clon_post_ejecucion.instance_eval(&(post)) unless (post.nil?)
+          clonador.evaluar_en_clon(self,post)
         end
         resultado #Lo guardamos para los métodos que retornan valores
       end
