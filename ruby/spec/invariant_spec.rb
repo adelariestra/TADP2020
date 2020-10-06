@@ -149,5 +149,24 @@ describe Invariant do
       expect(subject.vida).to eq(20)
     end
   end
+
+  it 'Si una invariante utiliza un accessor, no quiero que entre en recursividad' do
+    class Gladiador
+      include Contratos
+      attr_accessor :vida
+
+      invariant {vida<5000}
+      def initialize(cantidad_vida)
+        @vida = cantidad_vida
+      end
+
+      def esta_a_un_golpe
+        @vida -= 10
+        @vida <= 0
+      end
+    end
+
+    subject = Gladiador.new(20)
+  end
 end
 

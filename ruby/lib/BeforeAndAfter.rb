@@ -7,10 +7,10 @@ module BeforeAndAfter
   end
 
   def inicializar_listas
-    puts "inicializadas"
     @procs_before ||= []
     @procs_after ||= []
     @invariantes ||= []
+    @accessors ||= []
     @buffer_pre_post ||= PrePost.new(nil, nil)
   end
 
@@ -31,6 +31,18 @@ module BeforeAndAfter
     @invariantes << invariante
   end
 
+  def attr_accessor(*args)
+    # Para capturar los accessors definidos en la clase
+    args.each { |arg| @accessors << arg }
+    super
+  end
+
+  def attr_reader(*args)
+    # Para capturar los getters definidos en la clase
+    args.each { |arg| @accessors << arg }
+    super
+  end
+
   def method_added(nombre_metodo)
     #puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}"
     #puts self.instance_variables
@@ -45,7 +57,7 @@ module BeforeAndAfter
       pre = @buffer_pre_post.pre
       post = @buffer_pre_post.post
       invariantes = @invariantes
-
+      accessors = @accessors
       clonador = EvaluadorContratos.new
 
       nombres_parametros = metodo.parameters.map { |parametro| parametro[1] } # Obtener nombres de parámetros del método y mapearlo para solo quedar con los nombres (ignorar el "obligatorio" de la tupla)
@@ -54,9 +66,15 @@ module BeforeAndAfter
       define_method(nombre_metodo) do |*args, &bloque|
         # DEBUG: puts "Analizo rec METODO: #{nombre_metodo} --------------------------------------"
 
+        if(accessors.include? nombre_metodo) # si es un accessor...
+          resultado = metodo.bind(self).call(*args, &bloque)
+          puts "Era un accessor! #{nombre_metodo}"
+          return resultado
+        end
+
         @is_clone ||= false # Si esta nil lo setea en false
 
-        if (@is_clone)  # Se ignoran invariantes y prepost.
+        if (@is_clone) # Se ignoran invariantes y prepost.
           procs_before.each { |procs| self.instance_eval &procs }
           resultado = metodo.bind(self).call(*args, &bloque)
           procs_after.each { |procs| self.instance_eval &procs }
