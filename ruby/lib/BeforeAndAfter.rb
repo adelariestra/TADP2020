@@ -49,7 +49,7 @@ module BeforeAndAfter
     #puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}"
     #puts self.instance_variables
 
-    mutex_subrescritura do
+    flag_sobreescritura do
       # Método utilizado para evitar recursividad infinita
       metodo = instance_method(nombre_metodo)
 
@@ -87,7 +87,7 @@ module BeforeAndAfter
     #end
   end
 
-  def mutex_subrescritura
+  def flag_sobreescritura
     begin
       # Para evitar tener un atributo con un nombre que podria existir en la clase, utilizo una "variable" del contexto del thread de ejecución
       return if Thread.current[:__actualizando__] # si ya esta overrideando skipeo
