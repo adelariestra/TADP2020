@@ -145,8 +145,8 @@ describe Invariant do
         end
       end
 
-      subject = Gladiador.new(50)
-      expect(subject.vida).to eq(50)
+      subject = Gladiador.new(20)
+      expect(subject.vida).to eq(20)
     end
   end
 end

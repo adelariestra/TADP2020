@@ -55,13 +55,13 @@ module BeforeAndAfter
       post = @buffer_pre_post.post
       invariantes = @invariantes
       clonador = Clonador.new
-      #parametros = metodo.parameters.map { |parametro| parametro[1] }
+      nombres_parametros = metodo.parameters.map { |parametro| parametro[1] }
 
       # Redefinición del método para agregarle comportamiento
       define_method(nombre_metodo) do |*args, &bloque|
         puts "Analizo rec METODO: #{nombre_metodo} --------------------------------------"
         @is_clone ||= false
-        #puts "ZIP: #{parametros.zip(args)}"
+        parametros = nombres_parametros.zip(args)
 
         if (@is_clone)
           procs_before.each { |procs| self.instance_eval &procs }
@@ -70,7 +70,7 @@ module BeforeAndAfter
         else
 
           # Precondiciones
-          clonador.evaluar_en_clon(self,pre)
+          clonador.evaluar_precondicion_en_clon(self, pre, parametros)
 
           # Agregar metodos del before and after
           procs_before.each { |procs| self.instance_eval &procs } # Ejecutar el proc en el contexto de self (osea de la clase)
@@ -78,10 +78,10 @@ module BeforeAndAfter
           procs_after.each { |procs| self.instance_eval &procs }
 
           # Invariantes
-          clonador.evaluar_en_clon(self,invariantes) #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
+          clonador.evaluar_invariantes_en_clon(self, invariantes) #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
 
           # Postcondiciones
-          clonador.evaluar_en_clon(self,post)
+          clonador.evaluar_postcondicion_en_clon(self, post, parametros, resultado)
         end
         resultado #Lo guardamos para los métodos que retornan valores
       end
