@@ -33,13 +33,13 @@ module BeforeAndAfter
 
   def attr_accessor(*args)
     # Para capturar los accessors definidos en la clase
-    args.each { |arg| @accessors << arg }
+    @accessors += args
     super
   end
 
   def attr_reader(*args)
     # Para capturar los getters definidos en la clase
-    args.each { |arg| @accessors << arg }
+    @accessors += args
     super
   end
 
@@ -102,12 +102,8 @@ module BeforeAndAfter
     return if Thread.current[:__actualizando__] # si ya esta overrideando skipeo
 
     Thread.current[:__actualizando__] = true
-    begin
-      yield if block_given? # ejecutar el bloque entrante
-    rescue StandardError
-      Thread.current[:__actualizando__] = false
-      raise
-    end
+    yield if block_given? # ejecutar el bloque entrante
+  ensure
     Thread.current[:__actualizando__] = false
   end
 end
