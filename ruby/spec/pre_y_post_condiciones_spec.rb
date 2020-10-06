@@ -83,6 +83,8 @@ describe PreYPostCondiciones do
 
     it 'Deberia poder utilizar el nombre de los parámetros de un método en los pre/postcondiciones' do
       class Operaciones
+        include Contratos
+
         #precondición de dividir
         pre { divisor != 0 }
         #postcondición de dividir

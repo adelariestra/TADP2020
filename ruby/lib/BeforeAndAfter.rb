@@ -12,7 +12,7 @@ module BeforeAndAfter
     @procs_before ||= []
     @procs_after ||= []
     @invariantes ||= []
-    @buffer_pre_post ||= PrePost.new(nil,nil)
+    @buffer_pre_post ||= PrePost.new(nil, nil)
   end
 
   def before_and_after_each_call(proc_before, proc_after)
@@ -21,7 +21,7 @@ module BeforeAndAfter
   end
 
   def agregar_pre_buffer(proc_before)
-    @buffer_pre_post.pre =proc_before
+    @buffer_pre_post.pre = proc_before
   end
 
   def agregar_post_buffer(proc_after)
@@ -54,39 +54,42 @@ module BeforeAndAfter
       pre = @buffer_pre_post.pre
       post = @buffer_pre_post.post
       invariantes = @invariantes
+      #parametros = metodo.parameters.map { |parametro| parametro[1] }
 
       # Redefinición del método para agregarle comportamiento
       define_method(nombre_metodo) do |*args, &bloque|
         puts "Analizo rec METODO: #{nombre_metodo} --------------------------------------"
-        #  RECURSIVIDAD
-        if (!(@__metodos_anteriores__.nil?) and (@__metodos_anteriores__.include? nombre_metodo and @__contador_iteraciones__ != 1))
-          return metodo.bind(self).call(*args, &bloque)
+        @is_clone ||= false
+        #puts "ZIP: #{parametros.zip(args)}"
+
+        if (@is_clone)
+          puts "Soy un clon"
+          procs_before.each { |procs| self.instance_eval &procs }
+          resultado = metodo.bind(self).call(*args, &bloque)
+          procs_after.each { |procs| self.instance_eval &procs }
+        else
+          clon_pre_ejecucion = self.clone
+          clon_pre_ejecucion.instance_variable_set(:@is_clone, true)
+          # Precondiciones
+          clon_pre_ejecucion.instance_eval(&(pre)) unless (pre.nil?)
+
+          # Agregar metodos del before and after
+          procs_before.each { |procs| self.instance_eval &procs } # Ejecutar el proc en el contexto de self (osea de la clase)
+          resultado = metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la instancia)..
+          procs_after.each { |procs| self.instance_eval &procs }
+
+          # Invariantes
+          invariantes.each do |invariante|
+            clon = self.clone
+            clon.instance_variable_set(:@is_clone, true)
+            clon.instance_eval &invariante
+          end #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
+
+          clon_post_ejecucion = self.clone
+          clon_post_ejecucion.instance_variable_set(:@is_clone, true)
+          # Postcondiciones
+          clon_post_ejecucion.instance_eval(&(post)) unless (post.nil?)
         end
-
-        @__metodos_anteriores__ ||= []
-        @__metodos_anteriores__ << nombre_metodo
-        @__contador_iteraciones__ ||= 0
-        @__contador_iteraciones__ += 1
-
-        #puts "Ej Contrato METODO: #{nombre_metodo} --------------------------------------"
-        # Precondicionesa
-        self.instance_eval(&(pre)) unless (pre.nil?)
-
-        # Agregar metodos del before and after
-        procs_before.each { |procs| self.instance_eval &procs } # Ejecutar el proc en el contexto de self (osea de la clase)
-        resultado = metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la instancia)..
-        procs_after.each { |procs| self.instance_eval &procs }
-
-        # Invariantes
-        invariantes.each{|invariante| self.instance_eval &invariante} #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
-
-        # Postcondiciones
-        self.instance_eval(&(post)) unless (post.nil?)
-
-        # RECURSIVIDAD
-        @__contador_iteraciones__ -= 1
-        @__metodos_anteriores__.clear if @__contador_iteraciones__ == 0
-
         resultado #Lo guardamos para los métodos que retornan valores
       end
       @buffer_pre_post.limpiar # Para que no afecte a los siguientes métodos
