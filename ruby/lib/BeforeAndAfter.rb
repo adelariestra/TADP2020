@@ -40,6 +40,11 @@ module BeforeAndAfter
     end
   end
 
+  def attr_accessor(*args)
+    #TODO: Tal vez pueden capturar la recursividad ya que es de uno de los accessors la que siempre la genera la recursividad que tienen 
+    super
+  end
+
   def method_added(nombre_metodo)
     #puts "!! DEBUG !! Nuevo metodo agregado:  #{nombre_metodo}"
     #puts self.instance_variables
@@ -60,29 +65,21 @@ module BeforeAndAfter
       # Redefinición del método para agregarle comportamiento
       define_method(nombre_metodo) do |*args, &bloque|
         puts "Analizo rec METODO: #{nombre_metodo} --------------------------------------"
-        @is_clone ||= false
-        #puts "ZIP: #{parametros.zip(args)}"
+        # Precondiciones
+        clonador.evaluar_en_clon(self,pre)
 
-        if (@is_clone)
-          procs_before.each { |procs| self.instance_eval &procs }
-          resultado = metodo.bind(self).call(*args, &bloque)
-          procs_after.each { |procs| self.instance_eval &procs }
-        else
+        # Agregar metodos del before and after
+        procs_before.each { |procs| self.instance_eval &procs } # Ejecutar el proc en el contexto de self (osea de la clase)
+        resultado = metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la instancia)..
+        procs_after.each { |procs| self.instance_eval &procs }
 
-          # Precondiciones
-          clonador.evaluar_en_clon(self,pre)
+        # Invariantes
+        #TODO: deberian tal vez cortar aca la recursividad
+        clonador.evaluar_en_clon(self,invariantes) unless accessors_recursivos.include? nombre_metodo.to_sym #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
 
-          # Agregar metodos del before and after
-          procs_before.each { |procs| self.instance_eval &procs } # Ejecutar el proc en el contexto de self (osea de la clase)
-          resultado = metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la instancia)..
-          procs_after.each { |procs| self.instance_eval &procs }
+        # Postcondiciones
+        clonador.evaluar_en_clon(self,post)
 
-          # Invariantes
-          clonador.evaluar_en_clon(self,invariantes) #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
-
-          # Postcondiciones
-          clonador.evaluar_en_clon(self,post)
-        end
         resultado #Lo guardamos para los métodos que retornan valores
       end
       @buffer_pre_post.limpiar # Para que no afecte a los siguientes métodos
@@ -91,11 +88,14 @@ module BeforeAndAfter
   end
 
   def mutex_subrescritura
-    # Para evitar tener un atributo con un nombre que podria existir en la clase, utilizo una "variable" del contexto del thread de ejecución
-    return if Thread.current[:__actualizando__] # si ya esta overrideando skipeo
+    begin
+      # Para evitar tener un atributo con un nombre que podria existir en la clase, utilizo una "variable" del contexto del thread de ejecución
+      return if Thread.current[:__actualizando__] # si ya esta overrideando skipeo
 
-    Thread.current[:__actualizando__] = true
-    yield if block_given? # ejecutar el bloque entrante
-    Thread.current[:__actualizando__] = false
+      Thread.current[:__actualizando__] = true
+      yield if block_given? # ejecutar el bloque entrante
+    ensure
+      Thread.current[:__actualizando__] = false
+    end
   end
 end

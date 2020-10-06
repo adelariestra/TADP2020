@@ -1,9 +1,9 @@
 describe Invariant do
   before do
     class Guerrero
+      include Contratos
 
       attr_accessor :vida
-      include Contratos
 
       invariant { vida >= 0 }
 
@@ -35,8 +35,8 @@ describe Invariant do
 
   it 'Si al crear el objeto con los attr abajo del include y la invariant se cumple, no tira error' do
     class Guerrero2
-
       include Contratos
+
       attr_accessor :vida
 
       invariant { vida >= 0 }
@@ -73,9 +73,10 @@ describe Invariant do
 
     it 'Al haber una clase con más de una invariant, ambas se ejecutan' do
       class Espadachin
+        include Contratos
+
         attr_accessor :vida
 
-        include Contratos
         invariant { vida >= 0 }
         invariant { vida < 1000 }
 
@@ -98,8 +99,8 @@ describe Invariant do
 
     it 'Al haber una clase con más de una invariant con distintos métodos, ambas se ejecutan' do
       class Espadachin2
-
         include Contratos
+
         attr_accessor :vida, :danio
 
         invariant { vida >= 0 }
@@ -131,8 +132,9 @@ describe Invariant do
 
     it 'Si una invariante utiliza un método que tiene efecto, no quiero que me instancia sea modificada' do
       class Gladiador
-        attr_accessor :vida
         include Contratos
+
+        attr_accessor :vida
 
         invariant {!esta_a_un_golpe}
         def initialize(cantidad_vida)
