@@ -80,5 +80,25 @@ describe PreYPostCondiciones do
       subject = Bibliotecarioo.new(100,0,0)
       subject.retar_persona_sin_matarla()
     end
+
+    it 'Deberia poder utilizar el nombre de los parámetros de un método en los pre/postcondiciones' do
+      class Operaciones
+        #precondición de dividir
+        pre { divisor != 0 }
+        #postcondición de dividir
+        post { |result| result * divisor == dividendo }
+        def dividir(dividendo, divisor)
+          dividendo / divisor
+        end
+
+        # este método no se ve afectado por ninguna pre/post condición
+        def restar(minuendo, sustraendo)
+          minuendo - sustraendo
+        end
+      end
+
+      subject = Operaciones.new
+      subject.dividir(7,1)
+    end
   end
 end
