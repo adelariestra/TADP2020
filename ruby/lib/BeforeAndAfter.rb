@@ -58,7 +58,7 @@ module BeforeAndAfter
       post = @buffer_pre_post.post
       invariantes = @invariantes
       accessors = @accessors
-      clonador = EvaluadorContratos.new
+      evaluador_contratos = EvaluadorContratos.new
 
       nombres_parametros = metodo.parameters.map { |parametro| parametro[1] } # Obtener nombres de parámetros del método y mapearlo para solo quedar con los nombres (ignorar el "obligatorio" de la tupla)
 
@@ -74,28 +74,23 @@ module BeforeAndAfter
 
         @is_clone ||= false # Si esta nil lo setea en false
 
-        if @is_clone # Se ignoran invariantes y prepost.
-          procs_before.each { |procs| instance_eval(&procs) }
-          resultado = metodo.bind(self).call(*args, &bloque)
-          procs_after.each { |procs| instance_eval(&procs) }
-        else
+        unless @is_clone # Se ignoran invariantes y pre
           parametros = nombres_parametros.zip(args) # Agrupar los nombres de argumentos con sus valores en una lista de tuplas.
-          # Precondiciones
-          clonador.evaluar_precondicion_en_clon(self, pre, parametros)
+          evaluador_contratos.evaluar_precondicion_en_clon(self, pre, parametros)
           # se pasan los parametroos para poder ejecutar condiciones que los utilicen
           # se evalua sobre un clon para que las condiciones y befores de las condiciones no afecten al objeto original.
-
-          # Agregar metodos del before and after
-          procs_before.each { |procs| instance_eval(&procs) } # Ejecutar el proc en el contexto de self (osea de la instancia)
-          resultado = metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la instancia)..
-          procs_after.each { |procs| instance_eval(&procs) }
-
-          # Invariantes
-          clonador.evaluar_invariantes_en_clon(self, invariantes) #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
-
-          # Postcondiciones
-          clonador.evaluar_postcondicion_en_clon(self, post, parametros, resultado)
         end
+
+        # Agregar metodos del before and after
+        procs_before.each { |procs| instance_eval(&procs) } # Ejecutar el proc en el contexto de self (osea de la instancia)
+        resultado = metodo.bind(self).call(*args, &bloque) # Reconectar el unbound method self (osea la instancia)..
+        procs_after.each { |procs| instance_eval(&procs) }
+
+        unless @is_clone # Se ignoran invariantes y post.
+          evaluador_contratos.evaluar_invariantes_en_clon(self, invariantes) #Se separa de los after por si alguno se ejecuta después de la invariante y modifica al objeto (pudiendo no cumplir la condición de la invariante)
+          evaluador_contratos.evaluar_postcondicion_en_clon(self, post, parametros, resultado)
+        end
+
         resultado # Lo guardamos para los métodos que retornan valores
       end
       @buffer_pre_post.limpiar # Para que no afecte a los siguientes métodos
