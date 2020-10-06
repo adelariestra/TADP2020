@@ -4,8 +4,8 @@ describe BeforeAndAfter do
   describe '#BeforeAndAfter' do
     before do
       class ClaseTest
-        attr_reader :antes, :despues, :medio
         include Contratos
+        attr_reader :antes, :despues, :medio
 
         before_and_after_each_call(proc { @antes = 1 }, proc { @despues = 1 })
 
@@ -24,13 +24,8 @@ describe BeforeAndAfter do
 
     it 'Al ejecutar un mensaje que llama a otros de self, ejecuta los procs por cada uno' do
       class ClaseTest3
-        attr_reader :antes, :despues, :medio
-        def initialize
-          @antes = 0
-          @despues = 0
-        end
-
         include Contratos
+        attr_reader :antes, :despues, :medio
 
         before_and_after_each_call(proc do
           @antes ||= 0

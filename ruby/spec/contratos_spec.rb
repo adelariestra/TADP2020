@@ -1,8 +1,8 @@
 describe Contratos do
   before do
     class Pila
-      attr_accessor :current_node, :capacity
       include Contratos
+      attr_accessor :current_node, :capacity
 
       invariant { capacity >= 0 }
 
