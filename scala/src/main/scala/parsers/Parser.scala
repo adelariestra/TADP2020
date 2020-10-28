@@ -23,10 +23,10 @@ package object Parsertest { // significa que es un paquete con muchas cosas
 //    def analizar(cadena:String,f:String => ResultadoParser) = this
 //  }
 
-  def algo(cadena:String, parserBasico: ParserBasico): String ={
+  def algo(cadena:String, parserBasico: ParserBasico): Try[String] ={
     parserBasico match{
-      case AnyCharP =>  if(cadena.head.isLetter) cadena.head.toString() else "";
-      case IntegerP =>  if(cadena.head.isDigit) cadena.head.toString() else "";
+      case AnyCharP =>  if(cadena.head.isLetter) Try(cadena.head.toString()) else Try(throw new Exception("Error"));
+      case IntegerP =>  if(cadena.head.isDigit) Try(cadena.head.toString()) else Try(throw new Exception("Error"));
     }
   }
 
