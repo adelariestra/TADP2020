@@ -10,7 +10,7 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "parseo falla ante un no AnyCharP" in {
-    Parsertest.parsear("",AnyCharP).isFailure shouldEqual true
+    Parsertest.parsear("",AnyCharP).isFailure shouldEqual true // TODO: cambiar shoulEqual true por algun assert
   }
   
   it should "parsear correctamente cualquier DigitP" in {
@@ -38,6 +38,10 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
 
   it should "parsear correctamente cualquier IntegerP" in {
     Parsertest.parsear("8",IntegerP).get shouldEqual (8:Int)
+  }
+
+  it should "parsear correctamente cualquier IntegerP negativo" in {
+    Parsertest.parsear("-8",IntegerP).get shouldEqual (-8:Int)
   }
 
   it should "parseo falla ante un no IntegerP" in {
