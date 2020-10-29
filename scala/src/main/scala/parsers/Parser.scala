@@ -5,8 +5,8 @@ import scala.util.Try
 // TODO: cambiar nombre de package
 package object Parsertest {
 
-  def char (cadena:String): Unit ={
-    parsear(cadena,AnyCharP)
+  def char (charAMatchear:Char): ParserBasico ={
+    CharP(charAMatchear)
   }
 
   //TODO: hace falta?
@@ -24,7 +24,12 @@ package object Parsertest {
         if ( cadena.toDoubleOption.isDefined ) Try(cadena.toDouble) else Try(throw new Exception("Error"));
       case IntegerP =>
         if ( cadena.toIntOption.isDefined ) Try(cadena.toInt) else Try(throw new Exception("Error"));
+      case ORComb(parserBasico1,parserBasico2) =>{
+        if(parsear(cadena,parserBasico1).isSuccess)parsear(cadena,parserBasico1)
+        else parsear(cadena,parserBasico2)
+      }
 
+        //TODO: Agregar default
     }
   }
 }
