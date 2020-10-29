@@ -6,16 +6,51 @@ import parsers._
 import scala.util.Try
 
 class ParserSpec extends AnyFlatSpec with should.Matchers {
-  it should "parsear correctamente cualquier char" in {
-    Parsertest.algo("armenia",AnyCharP) shouldEqual Try("a")
+  it should "parsear correctamente cualquier AnyCharP" in {
+    Parsertest.parsear("armenia",AnyCharP).get shouldEqual( 'a':Char)
   }
 
-  it should "parsear correctamente cualquier integer" in {
-    Parsertest.algo("1armenia",IntegerP) shouldEqual Try("1")
+  it should "parseo falla ante un no AnyCharP" in {
+    Parsertest.parsear("1armenia",AnyCharP).isFailure shouldEqual true
+  }
+  
+  it should "parsear correctamente cualquier DigitP" in {
+    Parsertest.parsear("1armenia",DigitP).get shouldEqual ('1':Char)
+  }
+  it should "parseo falla ante un no DigitP" in {
+    Parsertest.parsear("armenia",DigitP).isFailure shouldEqual true
   }
 
-  it should "fallar ante un no integer" in {
-    Parsertest.algo("armenia",IntegerP).isFailure shouldEqual true
+  it should "parsear correctamente CharP" in {
+    Parsertest.parsear("armenia",CharP('a')).get shouldEqual ('a':Char)
   }
 
+  it should "parseo falla ante un no CharP" in {
+    Parsertest.parsear("armenia",CharP('b')).isFailure shouldEqual true
+  }
+
+  it should "parsear correctamente StringP" in {
+    Parsertest.parsear("armenia",StringP("arm")).get shouldEqual("arm":String)
+  }
+
+  it should "parseo falla ante un no StringP" in {
+    Parsertest.parsear("armenia",StringP("boca")).isFailure shouldEqual true
+  }
+
+  it should "parsear correctamente cualquier IntegerP" in {
+    Parsertest.parsear("8",IntegerP).get shouldEqual (8:Int)
+  }
+
+  it should "parseo falla ante un no IntegerP" in {
+    Parsertest.parsear("armenia",IntegerP).isFailure shouldEqual true
+  }
+
+  it should "parsear correctamente DoubleP" in {
+    println(Parsertest.parsear("8000.15",DoubleP).get)
+    Parsertest.parsear("8000.15",DoubleP).get shouldEqual (8000.15:Double)
+  }
+
+  it should "parseo falla ante un no DoubleP" in {
+    Parsertest.parsear("armenia",DoubleP).isFailure shouldEqual true
+  }
 }
