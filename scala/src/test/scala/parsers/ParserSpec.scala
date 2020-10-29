@@ -3,7 +3,6 @@ package tadp
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 import parsers._
-import scala.util.Try
 
 class ParserSpec extends AnyFlatSpec with should.Matchers {
   it should "parsear correctamente cualquier AnyCharP" in {
@@ -11,7 +10,7 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "parseo falla ante un no AnyCharP" in {
-    Parsertest.parsear("1armenia",AnyCharP).isFailure shouldEqual true
+    Parsertest.parsear("",AnyCharP).isFailure shouldEqual true
   }
   
   it should "parsear correctamente cualquier DigitP" in {
