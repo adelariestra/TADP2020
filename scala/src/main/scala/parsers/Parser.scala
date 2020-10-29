@@ -5,8 +5,12 @@ import scala.util.Try
 // TODO: cambiar nombre de package
 package object Parsertest {
 
+  // TODO: Terminar de poner todas las funciones de los parsers basicos
   def char(charAMatchear: Char): ParserBasico = {
     CharP(charAMatchear)
+  }
+  def integer: ParserBasico ={
+    IntegerP
   }
 
   def string(stringAMatchear: String): ParserBasico = {
@@ -60,6 +64,9 @@ package object Parsertest {
           segundoParseo
         else
           Try(throw new Exception("Error"));
+      }
+      case SepByComb(parserBasico1, parserBasico2) => {
+        /*TODO: Resolver*/ Try(throw new Exception("No implementation error"));
       }
 
       //TODO: Agregar default

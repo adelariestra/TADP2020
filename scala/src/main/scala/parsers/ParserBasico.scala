@@ -13,7 +13,9 @@ sealed trait ParserBasico{
   def ~>(parserBasico2: ParserBasico): ParserBasico = {
     RightComb(this,parserBasico2)
   }
-
+  def sepBy(parserBasico2: ParserBasico)= {
+    SepByComb(this,parserBasico2)
+  }
 }
 
 case object AnyCharP extends ParserBasico
@@ -26,3 +28,4 @@ case class ORComb(element1:ParserBasico,element2:ParserBasico) extends ParserBas
 case class ANDComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
 case class LeftComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
 case class RightComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
+case class SepByComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
