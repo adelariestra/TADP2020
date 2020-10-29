@@ -9,7 +9,13 @@ package object Parsertest {
     CharP(charAMatchear)
   }
 
-  //TODO: hace falta?
+  def string (stringAMatchear:String): ParserBasico ={
+    StringP(stringAMatchear)
+  }
+
+  //TODO: USAR TRY PARA NO ANDAR PREGUNTANDO EL ISSUCCESS?
+  // pasar parsear a un elemento de tipo Try[Any] y que tenga comportamiento que ante el success parsee
+  // y ante el failure retorne failure
   def parsear(cadena: String, parserBasico : ParserBasico): Try[Any] = {
     parserBasico match {
       case AnyCharP =>
@@ -27,6 +33,20 @@ package object Parsertest {
       case ORComb(parserBasico1,parserBasico2) =>{
         if(parsear(cadena,parserBasico1).isSuccess)parsear(cadena,parserBasico1)
         else parsear(cadena,parserBasico2)
+      }
+      case ANDComb(parserBasico1,parserBasico2) =>{
+        val primerParseo = parsear(cadena,parserBasico1)
+
+        if(primerParseo.isSuccess) {
+          val segundoParseo = parserBasico1 match{
+            case CharP(_) => parsear(cadena.substring(1,cadena.length),parserBasico2);
+            case StringP(string)=> parsear(cadena.substring(string.length,cadena.length),parserBasico2);
+          }
+          if(segundoParseo.isSuccess)
+            Try(primerParseo.get,segundoParseo.get)
+          else Try(throw new Exception("Error"));
+        } else Try(throw new Exception("Error"));
+
       }
 
         //TODO: Agregar default

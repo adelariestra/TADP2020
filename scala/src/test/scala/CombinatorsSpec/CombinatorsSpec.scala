@@ -17,4 +17,9 @@ class CombinatorsSpec extends AnyFlatSpec with should.Matchers {
     parsear("bol",aob).get shouldEqual ('b':Char)
   }
 
+  it should "parsear correctamente con combinator <>" in {
+    val aob = string("hola") <> string("mundo")
+    parsear("holamundo", aob).get shouldEqual ("hola","mundo")
+  }
+
 }
