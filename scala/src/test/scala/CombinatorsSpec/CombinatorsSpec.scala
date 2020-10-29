@@ -22,4 +22,30 @@ class CombinatorsSpec extends AnyFlatSpec with should.Matchers {
     parsear("holamundo", aob).get shouldEqual ("hola","mundo")
   }
 
+  it should "parsear correctamente con leftmost combinator" in {
+    val aob = string("hola") <~ string("holamundo")
+    parsear("holamundo", aob).get shouldEqual "hola"
+  }
+  it should "fallar leftmost combinator si el primero falla" in {
+    val aob = string("hola") <~ string("diferenteholamundo")
+    parsear("diferenteholamundo", aob).isFailure shouldEqual true
+  }
+  it should "fallar leftmost combinator si el segundo falla" in {
+    val aob = string("hola") <~ string("holadiferente")
+    parsear("holamundo", aob).isFailure shouldEqual true
+  }
+
+  it should "parsear correctamente con rightmost combinator" in {
+    val aob = string("hola") ~> string("holamundo")
+    parsear("holamundo", aob).get shouldEqual "holamundo"
+  }
+  it should "fallar rightmost combinator si el primero falla" in {
+    val aob = string("hola") ~> string("diferenteholamundo")
+    parsear("diferenteholamundo", aob).isFailure shouldEqual true
+  }
+  it should "fallar rightmost combinator si el segundo falla" in {
+    val aob = string("hola") ~> string("holadiferente")
+    parsear("holamundo", aob).isFailure shouldEqual true
+  }
+
 }

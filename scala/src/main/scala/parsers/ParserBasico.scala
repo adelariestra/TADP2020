@@ -7,7 +7,12 @@ sealed trait ParserBasico{
   def <>(parserBasico2: ParserBasico): ParserBasico = {
     ANDComb(this,parserBasico2)
   }
-
+  def <~(parserBasico2: ParserBasico): ParserBasico = {
+    LeftComb(this,parserBasico2)
+  }
+  def ~>(parserBasico2: ParserBasico): ParserBasico = {
+    RightComb(this,parserBasico2)
+  }
 
 }
 
@@ -19,3 +24,5 @@ case class StringP(stringName:String) extends ParserBasico
 case object DoubleP extends ParserBasico
 case class ORComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
 case class ANDComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
+case class LeftComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
+case class RightComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
