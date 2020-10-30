@@ -1,10 +1,8 @@
-package tadp
+package parsers
 
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 import parsers.Parsertest._
-import parsers._
-import scala.util.Try
 
 class CombinatorsSpec extends AnyFlatSpec with should.Matchers {
   it should "parsear correctamente con combinator <|> matcheando con el primero" in {

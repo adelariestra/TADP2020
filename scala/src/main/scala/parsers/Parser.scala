@@ -1,6 +1,6 @@
 package parsers
 
-import scala.util.Try
+import scala.util.{Success, Try}
 
 // TODO: cambiar nombre de package
 package object Parsertest {
@@ -9,7 +9,8 @@ package object Parsertest {
   def char(charAMatchear: Char): ParserBasico = {
     CharP(charAMatchear)
   }
-  def integer: ParserBasico ={
+
+  def integer: ParserBasico = {
     IntegerP
   }
 
@@ -38,13 +39,18 @@ package object Parsertest {
         if (parsear(cadena, parserBasico1).isSuccess) parsear(cadena, parserBasico1)
         else parsear(cadena, parserBasico2)
       }
-      case ANDComb(parserBasico1, parserBasico2) => {
+      case ConcatComb(parserBasico1, parserBasico2) => {
         val primerParseo = parsear(cadena, parserBasico1)
 
         if (primerParseo.isSuccess) {
           val segundoParseo = parserBasico1 match {
             case CharP(_) => parsear(cadena.substring(1, cadena.length), parserBasico2);
             case StringP(string) => parsear(cadena.substring(string.length, cadena.length), parserBasico2);
+            case OptionalOp(StringP(string)) =>
+              if (primerParseo.get == "")
+                parsear(cadena.substring(0, cadena.length), parserBasico2); // TODO: Fixear
+              else
+                parsear(cadena.substring(string.length, cadena.length), parserBasico2); // TODO: Fixear
           }
           if (segundoParseo.isSuccess)
             Try(primerParseo.get, segundoParseo.get)
@@ -65,12 +71,26 @@ package object Parsertest {
         else
           Try(throw new Exception("Error"));
       }
-      case SepByComb(parserBasico1, parserBasico2) => {
+      case SepByComb(parserContenido, parserSeparador) => {
         /*TODO: Resolver*/ Try(throw new Exception("No implementation error"));
       }
-
+      case SatisfiesOp(parserBasico: ParserBasico, condicion) => {
+        val primerParseo = parsear(cadena, parserBasico)
+        if (primerParseo.isFailure || condicion(primerParseo))
+          primerParseo
+        else Try(throw new Exception("Error"))
+      }
+      case OptionalOp(parserBasico: ParserBasico)=>{
+        val primerParseo = parsear(cadena, parserBasico)
+        if (primerParseo.isFailure)
+          Success("")// TODO: pasar a option
+        else
+          primerParseo
+      }
       //TODO: Agregar default
     }
   }
 }
 
+// sepby = contenido <> (separador <> contenido).+
+// integer = char('-').opt <> digit.+ =  results.flatmap(...).toInteger

@@ -1,11 +1,13 @@
 package parsers
+import scala.util.Try
 
+// TODO: renombrar de parser basico a parser
 sealed trait ParserBasico{
   def <|>(parserBasico2: ParserBasico): ParserBasico = {
     ORComb(this,parserBasico2)
   }
   def <>(parserBasico2: ParserBasico): ParserBasico = {
-    ANDComb(this,parserBasico2)
+    ConcatComb(this,parserBasico2)
   }
   def <~(parserBasico2: ParserBasico): ParserBasico = {
     LeftComb(this,parserBasico2)
@@ -16,6 +18,12 @@ sealed trait ParserBasico{
   def sepBy(parserBasico2: ParserBasico)= {
     SepByComb(this,parserBasico2)
   }
+  def satisfiesComb(condicion:Try[Any] => Boolean): ParserBasico ={
+    SatisfiesOp(this,condicion)
+  }
+  def opt: ParserBasico ={
+    OptionalOp(this)
+  }
 }
 
 case object AnyCharP extends ParserBasico
@@ -24,8 +32,12 @@ case object DigitP extends ParserBasico
 case class CharP(charName:Char) extends ParserBasico
 case class StringP(stringName:String) extends ParserBasico
 case object DoubleP extends ParserBasico
+
 case class ORComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
-case class ANDComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
+case class ConcatComb(element1:ParserBasico, element2:ParserBasico) extends ParserBasico
 case class LeftComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
 case class RightComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
 case class SepByComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
+
+case class SatisfiesOp(element:ParserBasico, condicion:Try[Any] => Boolean) extends ParserBasico
+case class OptionalOp(parserBasico: ParserBasico) extends ParserBasico
