@@ -5,19 +5,28 @@ import scala.util.{Success, Try}
 // TODO: cambiar nombre de package
 package object Parsertest {
 
-  // TODO: Terminar de poner todas las funciones de los parsers basicos
+  def anyChar:ParserBasico={
+    AnyCharP
+  }
+
   def char(charAMatchear: Char): ParserBasico = {
     CharP(charAMatchear)
   }
-
-  def integer: ParserBasico = {
-    IntegerP
+  def digitP: ParserBasico = {
+    DigitP
   }
 
   def string(stringAMatchear: String): ParserBasico = {
     StringP(stringAMatchear)
   }
 
+  def integer: ParserBasico = {
+    IntegerP
+  }
+
+  def double: ParserBasico = {
+    DoubleP
+  }
 
 }
 

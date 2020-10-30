@@ -9,28 +9,28 @@ import scala.util.Try
 
 class OperacionesSpec extends AnyFlatSpec with should.Matchers {
   it should "parsear correctamente con satisfies" in {
-    val sat = integer.satisfiesComb((element:Try[Any])=> {true})
+    val sat = integer.satisfies((element:Try[Any])=> {true})
     sat.parsear("8").get shouldEqual 8
   }
 
   it should "parsear correctamente con condicion que use resultado" in {
-    val sat = integer.satisfiesComb((element:Try[Any])=> element.get == 8)
+    val sat = integer.satisfies((element:Try[Any])=> element.get == 8)
     sat.parsear("8").get shouldEqual 8
   }
 
   it should "fallar satisfies si falla condicion" in {
-    val sat = integer.satisfiesComb((element:Try[Any])=> {false})
+    val sat = integer.satisfies((element:Try[Any])=> {false})
     sat.parsear("8").isFailure shouldEqual true
   }
 
   it should "fallar satisfies si falla condicion que use resultado" in {
-    val sat = integer.satisfiesComb((element:Try[Any])=> {element.get == 9})
+    val sat = integer.satisfies((element:Try[Any])=> {element.get == 9})
     sat.parsear("8").isFailure shouldEqual true
 
   }
 
   it should "fallar satisfies si falla parser inicial" in {
-    val aob = integer.satisfiesComb((element:Try[Any])=> {element.get == 8})
+    val aob = integer.satisfies((element:Try[Any])=> {element.get == 8})
     aob.parsear("450 450").isFailure shouldEqual true
   }
 

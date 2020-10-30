@@ -4,6 +4,7 @@ import scala.util.{Success, Try}
 
 // TODO: renombrar de parser basico a parser
 sealed trait ParserBasico{
+  // --- Combinators ---
   def <|>(parserBasico2: ParserBasico): ParserBasico = {
     ORComb(this,parserBasico2)
   }
@@ -19,7 +20,9 @@ sealed trait ParserBasico{
   def sepBy(parserBasico2: ParserBasico)= {
     SepByComb(this,parserBasico2)
   }
-  def satisfiesComb(condicion:Try[Any] => Boolean): ParserBasico ={
+
+  // --- Operaciones ---
+  def satisfies(condicion:Try[Any] => Boolean): ParserBasico ={
     SatisfiesOp(this,condicion)
   }
   def opt : ParserBasico ={
@@ -99,16 +102,12 @@ sealed trait ParserBasico{
           primerParseo
       }
       case KleeneOp(parserBasico: ParserBasico) => {
-        /* TODO: Resolver */
         /*TODO: Resolver*/ Try(throw new Exception("No implementation error"));
       }
       //TODO: Agregar default
     }
   }
 }
-// parsear(cadena,parser) => Try[]
-
-// parser.parsear(cadena) => Try[]
 
 case object AnyCharP extends ParserBasico
 case object IntegerP  extends ParserBasico
