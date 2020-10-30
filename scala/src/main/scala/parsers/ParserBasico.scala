@@ -21,8 +21,11 @@ sealed trait ParserBasico{
   def satisfiesComb(condicion:Try[Any] => Boolean): ParserBasico ={
     SatisfiesOp(this,condicion)
   }
-  def opt: ParserBasico ={
+  def opt : ParserBasico ={
     OptionalOp(this)
+  }
+  def * : ParserBasico ={
+    KleeneOp(this)
   }
 }
 
@@ -41,3 +44,4 @@ case class SepByComb(element1:ParserBasico,element2:ParserBasico) extends Parser
 
 case class SatisfiesOp(element:ParserBasico, condicion:Try[Any] => Boolean) extends ParserBasico
 case class OptionalOp(parserBasico: ParserBasico) extends ParserBasico
+case class KleeneOp(parserBasico: ParserBasico) extends ParserBasico

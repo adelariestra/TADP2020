@@ -87,6 +87,10 @@ package object Parsertest {
         else
           primerParseo
       }
+      case KleeneOp(parserBasico:ParserBasico)=>{
+        /* TODO: Resolver */
+        /*TODO: Resolver*/ Try(throw new Exception("No implementation error"));
+      }
       //TODO: Agregar default
     }
   }
