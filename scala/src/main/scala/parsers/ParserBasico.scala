@@ -1,6 +1,9 @@
 package parsers
 
-import scala.util.{Success, Try}
+import com.sun.net.httpserver.Authenticator.Failure
+
+import scala.util
+import scala.util.{Failure, Success, Try}
 
 // TODO: renombrar de parser basico a parser
 sealed trait ParserBasico {
@@ -128,10 +131,25 @@ case object AnyCharP extends ParserBasico {
 }
 
 case object IntegerP extends ParserBasico {
-  /*def obtener_resultado(cadena :String) :Try[ResultadoParseo]={
+  override def getResultado(cadena: String): Try [ResultadoParseo] = {
+    getConcatParseado( cadena, 0)
+  }
 
-  }*/
+  def getConcatParseado( cadena: String , valorParseado : Int ): Try[ResultadoParseo] = {
+    DigitP.getResultado(cadena).transform(
+      elem => Success(
+        getConcatParseado ( elem.getTextoRestante, concatInt( valorParseado , elem.getResultado ) ).get
+      ),
+      hola => Success( new ResultadoParseo( valorParseado , cadena ) )
+    )
+  }
+
+  def concatInt(valorParseado: Int, aConcatenar: Any): Int = {
+    (valorParseado.toString + aConcatenar.toString).toInt
+  }
+
 }
+
 
 case object DigitP extends ParserBasico {
   override def getResultado(cadena: String): Try[ResultadoParseo] = {

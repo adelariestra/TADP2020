@@ -6,55 +6,62 @@ import parsers.Parsertest._
 import parsers._
 
 class ParserSpec extends AnyFlatSpec with should.Matchers {
-  /*it should "parsear correctamente cualquier AnyCharP" in {
-    AnyCharP.parsear("armenia").get shouldEqual( 'a':Char)
+
+  it should "parsear correctamente cualquier AnyCharP" in {
+    AnyCharP.getResultado("armenia").get.getResultado() shouldEqual( 'a':Char)
   }
 
   it should "parseo falla ante un no AnyCharP" in {
-    AnyCharP.parsear("").isFailure shouldEqual true // TODO: cambiar shoulEqual true por algun assert
+    AnyCharP.getResultado("").isFailure shouldEqual true // TODO: cambiar shoulEqual true por algun assert
   }
-  
+
   it should "parsear correctamente cualquier DigitP" in {
-    DigitP.parsear("1armenia").get shouldEqual ('1':Char)
+    DigitP.getResultado("1armenia").get.getResultado() shouldEqual ('1':Char)
   }
+
   it should "parseo falla ante un no DigitP" in {
-    DigitP.parsear("armenia").isFailure shouldEqual true
+    DigitP.getResultado("armenia").isFailure shouldEqual true
   }
 
   it should "parsear correctamente CharP" in {
-    CharP('a').parsear("armenia").get shouldEqual ('a':Char)
+    CharP('a').getResultado("armenia").get.getResultado() shouldEqual ('a':Char)
   }
 
   it should "parseo falla ante un no CharP" in {
-    CharP('b').parsear("armenia").isFailure shouldEqual true
+    CharP('b').getResultado("armenia").isFailure shouldEqual true
   }
 
   it should "parsear correctamente StringP" in {
-    StringP("arm").parsear("armenia").get shouldEqual("arm":String)
+    StringP("arm").getResultado("armenia").get.getResultado() shouldEqual("arm":String)
   }
 
   it should "parseo falla ante un no StringP" in {
-    StringP("boca").parsear("armenia").isFailure shouldEqual true
+    StringP("boca").getResultado("armenia").isFailure shouldEqual true
   }
 
-  it should "parsear correctamente cualquier IntegerP" in {
-    IntegerP.parsear("8").get shouldEqual (8:Int)
+  it should "parsear correctamente IntegerP si cadena es un numero" in {
+    IntegerP.getResultado("88").get.getResultado() shouldEqual (88:Int)
   }
 
+  it should "parsear correctamente IntegerP si cadena es un numero con letras" in {
+    IntegerP.getResultado("10000AA").get.getResultado() shouldEqual (10000:Int)
+  }
+
+/*
   it should "parsear correctamente cualquier IntegerP negativo" in {
-    IntegerP.parsear("-8").get shouldEqual (-8:Int)
+    IntegerP.getResultado("-8").get shouldEqual (-8:Int)
   }
 
   it should "parseo falla ante un no IntegerP" in {
-    IntegerP.parsear("armenia").isFailure shouldEqual true
+    IntegerP.getResultado("armenia").isFailure shouldEqual true
   }
 
   it should "parsear correctamente DoubleP" in {
-    DoubleP.parsear("8000.15").get shouldEqual (8000.15:Double)
+    DoubleP.getResultado("8000.15").get shouldEqual (8000.15:Double)
   }
 
   it should "parseo falla ante un no DoubleP" in {
-    DoubleP.parsear("armenia").isFailure shouldEqual true
+    DoubleP.getResultado("armenia").isFailure shouldEqual true
   }
 */
   it should "parsear correctamente cualquier AnyCharP2" in {
