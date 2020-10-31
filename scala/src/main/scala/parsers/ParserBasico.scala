@@ -132,21 +132,31 @@ case object AnyCharP extends ParserBasico {
 
 case object IntegerP extends ParserBasico {
   override def getResultado(cadena: String): Try [ResultadoParseo] = {
-    getConcatParseado( cadena, 0)
-  }
-
-  def getConcatParseado( cadena: String , valorParseado : Int ): Try[ResultadoParseo] = {
-    DigitP.getResultado(cadena).transform(
-      elem => Success(
-        getConcatParseado ( elem.getTextoRestante, concatInt( valorParseado , elem.getResultado ) ).get
-      ),
-      hola => Success( new ResultadoParseo( valorParseado , cadena ) )
+    CharP('-').getResultado(cadena).transform(
+      elem =>  getConcatParseado( elem.getTextoRestante(), 0, true),
+      elem => getConcatParseado( cadena, 0, false)
     )
   }
 
-  def concatInt(valorParseado: Int, aConcatenar: Any): Int = {
-    (valorParseado.toString + aConcatenar.toString).toInt
+  def getConcatParseado( cadena: String , valorParseado : Int , esNegativo: Boolean ): Try[ResultadoParseo] = {
+    DigitP.getResultado(cadena).transform(
+      elem => Success(
+        getConcatParseado (
+          elem.getTextoRestante,
+          concatInt( valorParseado , elem.getResultado, esNegativo),
+          false ).get
+      ),
+      _ => Success( new ResultadoParseo( valorParseado , cadena ) )
+    )
   }
+
+  def concatInt(valorParseado: Int, aConcatenar: Any, esNegativo: Boolean): Int = {
+    var stringBase : String =  if (esNegativo) "-" else valorParseado.toString
+    val valorAConcatenar = aConcatenar.toString
+
+    (stringBase + valorAConcatenar).toInt
+  }
+
 
 }
 

@@ -47,14 +47,24 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
     IntegerP.getResultado("10000AA").get.getResultado() shouldEqual (10000:Int)
   }
 
+  it should "parsear correctamente IntegerP si cadena es un numero negativo " in {
+    IntegerP.getResultado("-10").get.getResultado() shouldEqual (-10:Int)
+  }
+
+  it should "parsear correctamente IntegerP si cadena es un numero negativo con letras" in {
+    IntegerP.getResultado("-10ABCsdfds").get.getResultado() shouldEqual (-10:Int)
+  }
+
+  it should "parseo falla ante un no IntegerP" in {
+    IntegerP.getResultado("armenia" ).isFailure shouldEqual true
+  }
+
 /*
   it should "parsear correctamente cualquier IntegerP negativo" in {
     IntegerP.getResultado("-8").get shouldEqual (-8:Int)
   }
 
-  it should "parseo falla ante un no IntegerP" in {
-    IntegerP.getResultado("armenia").isFailure shouldEqual true
-  }
+
 
   it should "parsear correctamente DoubleP" in {
     DoubleP.getResultado("8000.15").get shouldEqual (8000.15:Double)
