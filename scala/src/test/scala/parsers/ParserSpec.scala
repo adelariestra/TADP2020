@@ -59,6 +59,10 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
     IntegerP.getResultado("armenia" ).isFailure shouldEqual true
   }
 
+  it should "parseo falla ante un no IntegerP con numeros por el medio" in {
+    IntegerP.getResultado("armenia123" ).isFailure shouldEqual true
+  }
+
 /*
   it should "parsear correctamente cualquier IntegerP negativo" in {
     IntegerP.getResultado("-8").get shouldEqual (-8:Int)
