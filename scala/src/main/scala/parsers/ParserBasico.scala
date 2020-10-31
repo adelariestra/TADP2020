@@ -3,39 +3,49 @@ package parsers
 import scala.util.{Success, Try}
 
 // TODO: renombrar de parser basico a parser
-sealed trait ParserBasico{
+sealed trait ParserBasico {
+  def getResultado(cadena :String): Try[ResultadoParseo] ={
+    Try(new ResultadoParseo(null, null))
+  }
+
   // --- Combinators ---
   def <|>(parserBasico2: ParserBasico): ParserBasico = {
-    ORComb(this,parserBasico2)
+    ORComb(this, parserBasico2)
   }
+
   def <>(parserBasico2: ParserBasico): ParserBasico = {
-    ConcatComb(this,parserBasico2)
+    ConcatComb(this, parserBasico2)
   }
+
   def <~(parserBasico2: ParserBasico): ParserBasico = {
-    LeftComb(this,parserBasico2)
+    LeftComb(this, parserBasico2)
   }
+
   def ~>(parserBasico2: ParserBasico): ParserBasico = {
-    RightComb(this,parserBasico2)
+    RightComb(this, parserBasico2)
   }
-  def sepBy(parserBasico2: ParserBasico)= {
-    SepByComb(this,parserBasico2)
+
+  def sepBy(parserBasico2: ParserBasico) = {
+    SepByComb(this, parserBasico2)
   }
 
   // --- Operaciones ---
-  def satisfies(condicion:Try[Any] => Boolean): ParserBasico ={
-    SatisfiesOp(this,condicion)
+  def satisfies(condicion: Any => Boolean): ParserBasico = {
+    SatisfiesOp(this, condicion)
   }
-  def opt : ParserBasico ={
+
+  def opt: ParserBasico = {
     OptionalOp(this)
   }
-  def * : ParserBasico ={
+
+  def * : ParserBasico = {
     KleeneOp(this)
   }
 
   //TODO: USAR TRY PARA NO ANDAR PREGUNTANDO EL ISSUCCESS?
   // pasar parsear a un elemento de tipo Try[Any] y que tenga comportamiento que ante el success parsee
   // y ante el failure retorne failure
-  def parsear(cadena: String): Try[Any] = {
+  /*def parsear(cadena: String): Try[Any] = {
     this match {
       case AnyCharP =>
         if (!cadena.isEmpty) Try(cadena.head) else Try(throw new Exception("Error")); // TODO: cambiar if !cond
@@ -54,6 +64,7 @@ sealed trait ParserBasico{
         else parserBasico2.parsear(cadena)
       }
       case ConcatComb(parserBasico1, parserBasico2) => {
+
         val primerParseo = parserBasico1.parsear(cadena)
 
         if (primerParseo.isSuccess) {
@@ -106,22 +117,88 @@ sealed trait ParserBasico{
       }
       //TODO: Agregar default
     }
+  }*/
+
+}
+
+case object AnyCharP extends ParserBasico {
+  override def getResultado(cadena: String): Try[ResultadoParseo] = {
+    Try(cadena).map(elemento => new ResultadoParseo(elemento.head, elemento.tail))
   }
 }
 
-case object AnyCharP extends ParserBasico
-case object IntegerP  extends ParserBasico
-case object DigitP extends ParserBasico
-case class CharP(charName:Char) extends ParserBasico
-case class StringP(stringName:String) extends ParserBasico
-case object DoubleP extends ParserBasico
+case object IntegerP extends ParserBasico {
+  /*def obtener_resultado(cadena :String) :Try[ResultadoParseo]={
 
-case class ORComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
-case class ConcatComb(element1:ParserBasico, element2:ParserBasico) extends ParserBasico
-case class LeftComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
-case class RightComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
-case class SepByComb(element1:ParserBasico,element2:ParserBasico) extends ParserBasico
+  }*/
+}
 
-case class SatisfiesOp(element:ParserBasico, condicion:Try[Any] => Boolean) extends ParserBasico
-case class OptionalOp(parserBasico: ParserBasico) extends ParserBasico
+case object DigitP extends ParserBasico {
+  override def getResultado(cadena: String): Try[ResultadoParseo] = {
+    Try(cadena).filter(elemento => elemento.head.isDigit)
+      .map(elemento => new ResultadoParseo(elemento.head, elemento.tail))
+  }
+}
+
+case class CharP(charName: Char) extends ParserBasico {
+  override def getResultado(cadena: String): Try[ResultadoParseo] = {
+    Try(cadena).filter(elemento => elemento.head.equals(charName))
+      .map(elemento => new ResultadoParseo(elemento.head.toInt, elemento.tail))
+  }
+}
+
+case class StringP(stringName: String) extends ParserBasico {
+  override def getResultado(cadena: String): Try[ResultadoParseo] = {
+    Try(cadena).filter(elemento => elemento.take(stringName.length).equals(stringName))
+      .map(elemento => new ResultadoParseo(elemento.take(stringName.length), elemento.drop(stringName.length)))
+  }
+}
+
+case object DoubleP extends ParserBasico {
+
+}
+
+case class ORComb(element1: ParserBasico, element2: ParserBasico) extends ParserBasico {
+  override def getResultado(cadena :String): Try[ResultadoParseo] = {
+    if (element1.getResultado(cadena).isSuccess) element1.getResultado(cadena)
+    else element2.getResultado(cadena)
+  }
+}
+
+case class ConcatComb(element1: ParserBasico, element2: ParserBasico) extends ParserBasico{
+  override def getResultado(cadena :String): Try[ResultadoParseo] = {
+    var resultado1 = element1.getResultado(cadena)
+    var resultado2 = element2.getResultado(resultado1.get.getTextoRestante())
+    Try(new ResultadoParseo((resultado1.get.getResultado(), resultado2.get.getResultado()), resultado2.get.getTextoRestante()))
+  }
+}
+
+case class LeftComb(element1: ParserBasico, element2: ParserBasico) extends ParserBasico{
+  override def getResultado(cadena :String): Try[ResultadoParseo] = {
+    var resultado1 = element1.getResultado(cadena)
+    var resultado2 = element2.getResultado(resultado1.get.getTextoRestante())
+    Try(new ResultadoParseo(resultado1.get.getResultado(), resultado2.get.getTextoRestante()))
+  }
+}
+
+case class RightComb(element1: ParserBasico, element2: ParserBasico) extends ParserBasico{
+  override def getResultado(cadena :String): Try[ResultadoParseo] = {
+    var resultado1 = element1.getResultado(cadena)
+    element2.getResultado(resultado1.get.getTextoRestante())
+  }
+}
+
+case class SepByComb(element1: ParserBasico, element2: ParserBasico) extends ParserBasico
+
+case class SatisfiesOp(element: ParserBasico, condicion: Any => Boolean) extends ParserBasico{
+  override def getResultado(cadena :String) :Try[ResultadoParseo] ={
+    element.getResultado(cadena).filter(elemento => condicion(elemento.getResultado()))
+  }
+
+}
+
+case class OptionalOp(parserBasico: ParserBasico) extends ParserBasico{
+
+}
+
 case class KleeneOp(parserBasico: ParserBasico) extends ParserBasico

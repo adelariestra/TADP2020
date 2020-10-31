@@ -6,7 +6,7 @@ import parsers.Parsertest._
 import parsers._
 
 class ParserSpec extends AnyFlatSpec with should.Matchers {
-  it should "parsear correctamente cualquier AnyCharP" in {
+  /*it should "parsear correctamente cualquier AnyCharP" in {
     AnyCharP.parsear("armenia").get shouldEqual( 'a':Char)
   }
 
@@ -55,5 +55,29 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
 
   it should "parseo falla ante un no DoubleP" in {
     DoubleP.parsear("armenia").isFailure shouldEqual true
+  }
+*/
+  it should "parsear correctamente cualquier AnyCharP2" in {
+    AnyCharP.getResultado("hola").get.getTextoRestante() shouldEqual ("ola":String)
+  }
+
+  it should "parsear cualquier AnyCharP con error" in {
+    AnyCharP.getResultado("").isFailure shouldEqual true
+  }
+
+  it should "parsear correctamente cualquier DigitP2" in {
+    DigitP.getResultado("7-1").get.getResultado() shouldEqual ('7':Char)
+  }
+
+  it should "parsear cualquier DigitP2 con error" in {
+    DigitP.getResultado("a71").isFailure shouldEqual true
+  }
+
+  it should "parsear cualquier CharP con error" in {
+    new CharP('b').getResultado("boca").get.getResultado() shouldEqual ('b':Char)
+  }
+
+  it should "parsear cualquier StringP con error" in {
+    new StringP("boca").getResultado("bocaCampeon").get.getTextoRestante() shouldEqual ("Campeon":String)
   }
 }

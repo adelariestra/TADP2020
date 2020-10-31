@@ -5,7 +5,7 @@ import scala.util.{Success, Try}
 // TODO: cambiar nombre de package
 package object Parsertest {
 
-  def anyChar:ParserBasico={
+  def anyChar(): ParserBasico ={
     AnyCharP
   }
 
