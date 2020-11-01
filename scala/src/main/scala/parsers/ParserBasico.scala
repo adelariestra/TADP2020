@@ -12,25 +12,20 @@ sealed trait ParserBasico {
   }
 
   // --- Combinators ---
-  def <|>(parserBasico2: ParserBasico): ParserBasico = {
-    ORComb(this, parserBasico2)
-  }
+  def <|>(parserBasico2: ParserBasico): ParserBasico = ORComb(this, parserBasico2)
 
-  def <>(parserBasico2: ParserBasico): ParserBasico = {
-    ConcatComb(this, parserBasico2)
-  }
 
-  def <~(parserBasico2: ParserBasico): ParserBasico = {
-    LeftComb(this, parserBasico2)
-  }
+  def <>(parserBasico2: ParserBasico): ParserBasico = ConcatComb(this, parserBasico2)
 
-  def ~>(parserBasico2: ParserBasico): ParserBasico = {
-    RightComb(this, parserBasico2)
-  }
 
-  def sepBy(parserBasico2: ParserBasico) = {
-    SepByComb(this, parserBasico2)
-  }
+  def <~(parserBasico2: ParserBasico): ParserBasico = LeftComb(this, parserBasico2)
+
+
+  def ~>(parserBasico2: ParserBasico): ParserBasico = RightComb(this, parserBasico2)
+
+
+  def sepBy(parserBasico2: ParserBasico) = SepByComb(this, parserBasico2)
+
 
   // --- Operaciones ---
   def satisfies(condicion: Any => Boolean): ParserBasico = {
@@ -126,7 +121,7 @@ sealed trait ParserBasico {
 
 case object AnyCharP extends ParserBasico {
   override def getResultado(cadena: String): Try[ResultadoParseo] = {
-    Try(cadena).map(elemento => new ResultadoParseo(elemento.head, elemento.tail))
+    Try(cadena).map(elemento => ResultadoParseo(elemento.head, elemento.tail))
   }
 }
 
@@ -142,11 +137,11 @@ case object IntegerP extends ParserBasico {
     DigitP.getResultado(cadena).transform(
       elem => Success(
         getConcatParseado (
-          elem.getTextoRestante,
+          elem.textoRestante,
           concatInt( valorParseado , elem.getResultado, esNegativo),
           false ).get
       ),
-      _ => Success( new ResultadoParseo( valorParseado.toInt , cadena ) )
+      _ => Success( ResultadoParseo( valorParseado.toInt , cadena ) )
     )
   }
 
@@ -164,21 +159,21 @@ case object IntegerP extends ParserBasico {
 case object DigitP extends ParserBasico {
   override def getResultado(cadena: String): Try[ResultadoParseo] = {
     Try(cadena).filter(elemento => elemento.head.isDigit)
-      .map(elemento => new ResultadoParseo(elemento.head, elemento.tail))
+      .map(elemento => ResultadoParseo(elemento.head, elemento.tail))
   }
 }
 
 case class CharP(charName: Char) extends ParserBasico {
   override def getResultado(cadena: String): Try[ResultadoParseo] = {
     Try(cadena).filter(elemento => elemento.head.equals(charName))
-      .map(elemento => new ResultadoParseo(elemento.head.toInt, elemento.tail))
+      .map(elemento => ResultadoParseo(elemento.head.toInt, elemento.tail))
   }
 }
 
 case class StringP(stringName: String) extends ParserBasico {
   override def getResultado(cadena: String): Try[ResultadoParseo] = {
     Try(cadena).filter(elemento => elemento.take(stringName.length).equals(stringName))
-      .map(elemento => new ResultadoParseo(elemento.take(stringName.length), elemento.drop(stringName.length)))
+      .map(elemento => ResultadoParseo(elemento.take(stringName.length), elemento.drop(stringName.length)))
   }
 }
 
@@ -195,23 +190,23 @@ case class ORComb(element1: ParserBasico, element2: ParserBasico) extends Parser
 
 case class ConcatComb(element1: ParserBasico, element2: ParserBasico) extends ParserBasico{
   override def getResultado(cadena :String): Try[ResultadoParseo] = {
-    var resultado1 = element1.getResultado(cadena)
-    var resultado2 = element2.getResultado(resultado1.get.getTextoRestante())
-    Try(new ResultadoParseo((resultado1.get.getResultado(), resultado2.get.getResultado()), resultado2.get.getTextoRestante()))
+    val resultado1 = element1.getResultado(cadena)
+    val resultado2 = element2.getResultado(resultado1.get.getTextoRestante())
+    Try(ResultadoParseo((resultado1.get.getResultado(), resultado2.get.getResultado()), resultado2.get.getTextoRestante()))
   }
 }
 
 case class LeftComb(element1: ParserBasico, element2: ParserBasico) extends ParserBasico{
   override def getResultado(cadena :String): Try[ResultadoParseo] = {
-    var resultado1 = element1.getResultado(cadena)
-    var resultado2 = element2.getResultado(resultado1.get.getTextoRestante())
-    Try(new ResultadoParseo(resultado1.get.getResultado(), resultado2.get.getTextoRestante()))
+    val resultado1 = element1.getResultado(cadena)
+    val resultado2 = element2.getResultado(resultado1.get.getTextoRestante())
+    Try(ResultadoParseo(resultado1.get.getResultado(), resultado2.get.getTextoRestante()))
   }
 }
 
 case class RightComb(element1: ParserBasico, element2: ParserBasico) extends ParserBasico{
   override def getResultado(cadena :String): Try[ResultadoParseo] = {
-    var resultado1 = element1.getResultado(cadena)
+    val resultado1 = element1.getResultado(cadena)
     element2.getResultado(resultado1.get.getTextoRestante())
   }
 }
