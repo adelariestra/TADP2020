@@ -2,42 +2,45 @@ package tadp
 
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
-import parsers.Parsertest._
+//import parsers.Parsertest._
 import parsers._
 
 class ParserSpec extends AnyFlatSpec with should.Matchers {
 
   it should "parsear correctamente cualquier AnyCharP" in {
-    AnyCharP.getResultado("armenia").get.getResultado() shouldEqual( 'a':Char)
+    anyChar("armenia") shouldEqual (ParseoExitoso('a', "rmenia"))
   }
 
   it should "parseo falla ante un no AnyCharP" in {
-    AnyCharP.getResultado("").isFailure shouldEqual true // TODO: cambiar shoulEqual true por algun assert
-  }
-
-  it should "parsear correctamente cualquier DigitP" in {
-    DigitP.getResultado("1armenia").get.getResultado() shouldEqual ('1':Char)
-  }
-
-  it should "parseo falla ante un no DigitP" in {
-    DigitP.getResultado("armenia").isFailure shouldEqual true
+    anyChar("").isErrorParseo shouldEqual true // TODO: cambiar shoulEqual true por algun assert
   }
 
   it should "parsear correctamente CharP" in {
-    CharP('a').getResultado("armenia").get.getResultado() shouldEqual ('a':Char)
+    char('a')("armenia") shouldEqual (ParseoExitoso('a', "rmenia"))
   }
 
   it should "parseo falla ante un no CharP" in {
-    CharP('b').getResultado("armenia").isFailure shouldEqual true
+    char('b')("armenia").isErrorParseo shouldEqual true
+  }
+
+  it should "parsear correctamente cualquier DigitP" in {
+    digit("1armenia") shouldEqual (ParseoExitoso('1',"armenia"))
+  }
+
+  it should "parseo falla ante un no DigitP" in {
+    digit("armenia").isErrorParseo shouldEqual true
   }
 
   it should "parsear correctamente StringP" in {
-    StringP("arm").getResultado("armenia").get.getResultado() shouldEqual("arm":String)
+    string("arm")("armenia") shouldEqual(ParseoExitoso("arm", "enia"))
   }
 
   it should "parseo falla ante un no StringP" in {
-    StringP("boca").getResultado("armenia").isFailure shouldEqual true
+    string("boca")("armenia").isErrorParseo shouldEqual true
   }
+}
+ /*
+
 
   it should "parsear correctamente IntegerP si cadena es un numero" in {
     IntegerP.getResultado("88").get.getResultado() shouldEqual (88:Int)
@@ -63,12 +66,9 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
     IntegerP.getResultado("armenia123" ).isFailure shouldEqual true
   }
 
-/*
   it should "parsear correctamente cualquier IntegerP negativo" in {
     IntegerP.getResultado("-8").get shouldEqual (-8:Int)
   }
-
-
 
   it should "parsear correctamente DoubleP" in {
     DoubleP.getResultado("8000.15").get shouldEqual (8000.15:Double)
@@ -77,28 +77,4 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
   it should "parseo falla ante un no DoubleP" in {
     DoubleP.getResultado("armenia").isFailure shouldEqual true
   }
-*/
-  it should "parsear correctamente cualquier AnyCharP2" in {
-    AnyCharP.getResultado("hola").get.getTextoRestante() shouldEqual ("ola":String)
-  }
-
-  it should "parsear cualquier AnyCharP con error" in {
-    AnyCharP.getResultado("").isFailure shouldEqual true
-  }
-
-  it should "parsear correctamente cualquier DigitP2" in {
-    DigitP.getResultado("7-1").get.getResultado() shouldEqual ('7':Char)
-  }
-
-  it should "parsear cualquier DigitP2 con error" in {
-    DigitP.getResultado("a71").isFailure shouldEqual true
-  }
-
-  it should "parsear cualquier CharP con error" in {
-    new CharP('b').getResultado("boca").get.getResultado() shouldEqual ('b':Char)
-  }
-
-  it should "parsear cualquier StringP con error" in {
-    new StringP("boca").getResultado("bocaCampeon").get.getTextoRestante() shouldEqual ("Campeon":String)
-  }
-}
+}*/

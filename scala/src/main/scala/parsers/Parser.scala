@@ -3,7 +3,7 @@ package parsers
 import scala.util.{Success, Try}
 
 // TODO: cambiar nombre de package
-package object Parsertest {
+/*package object Parsertest {
 
   def anyChar(): ParserBasico ={
     AnyCharP
@@ -28,7 +28,7 @@ package object Parsertest {
     DoubleP
   }
 
-}
+}*/
 
 // sepby = contenido <> (separador <> contenido).+
 // integer = char('-').opt <> digit.+ =  results.flatmap(...).toInteger

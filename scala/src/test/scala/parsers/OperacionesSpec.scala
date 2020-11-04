@@ -2,12 +2,14 @@ package parsers
 
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
-import parsers.Parsertest._
+//import parsers.Parsertest._
 
 import scala.util.Try
 
 
 class OperacionesSpec extends AnyFlatSpec with should.Matchers {
+
+/*
   it should "parsear correctamente con satisfies" in {
     val sat = integer.satisfies((element:Any)=> {true})
     sat.getResultado("8").get.getResultado() shouldEqual 8
@@ -44,4 +46,6 @@ class OperacionesSpec extends AnyFlatSpec with should.Matchers {
     val precedencia = talVezIn <> string("fija")
     precedencia.getResultado("fija").get.getResultado() shouldEqual ("","fija")
   }
+
+ */
 }
