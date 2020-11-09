@@ -1,14 +1,12 @@
 package parsers
 
-import com.sun.net.httpserver.Authenticator.Failure
-
-import scala.util
 import scala.util.{Failure, Success, Try}
 
 trait Parser[T] extends (String => Try[ResultadoParseo[T]]) {
   def <>[U](parser2: Parser[U]) = ConcatComb[T, U](this, parser2)
   def <|>[U](parser2: Parser[U]) = ORComb[T, U](this, parser2)
-
+  def <~[U](parser2: Parser[U]) = LeftComb[T, U](this, parser2)
+  def ~>[U](parser2: Parser[U]) = RightComb[T, U](this, parser2)
 }
 
 case object anyChar extends Parser[Char] {
@@ -89,21 +87,21 @@ case class ORComb[T, U](element1: Parser[T], element2: Parser[U]) extends Parser
   }
 }
 
-//case class ORComb[T, U, ](element1: Parser[T], element2: Parser[U]) extends Parser[V] {
-//  override def apply(cadena: String) = {
-//    if (element1.apply(cadena).isSuccess) element1.apply(cadena)
-//    else element2.apply(cadena)
-//  }
-//}
-/*
-TODO: Implementar
+case class RightComb[T,U](element1: Parser[T], element2: Parser[U]) extends Parser[Any]{
+  override def apply(cadena :String): Try[ResultadoParseo[Any]] = {
+    Try {
+      val cadenaRestante = element1.apply(cadena).get.cadenaRestante
+      element2.apply(cadenaRestante).get
+    }.recoverWith{ case e:Exception => return Failure(e) }
+ }
+}
 
 case class LeftComb[T,U](element1: Parser[T], element2: Parser[U]) extends Parser[T]{
   override def apply(cadena :String): Try[ResultadoParseo[T]] = {
-    val resultado1 :Try[ResultadoParseo[T]] = element1.apply(cadena)
-    val resultado2 :Try[ResultadoParseo[U]] = Try(element2.apply(resultado1.get.cadenaRestante).get)
-    if(resultado2.isSuccess) resultado1
-    else ???
+    Try {
+      val result1 = element1.apply(cadena)
+      element2.apply(result1.get.cadenaRestante).get // TODO: Mejorar
+      return result1
+    }.recoverWith{ case e:Exception => return Failure(e) }
   }
 }
-*/
