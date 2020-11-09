@@ -143,8 +143,26 @@ case class KleeneOp[T](element1: Parser[T]) extends Parser[List[T]] {
 }
 
 case class ClauPoseOp[T](element1: Parser[T]) extends Parser[List[T]] {
+
+
   override def apply(cadena: String):Try[ResultadoParseo[List[T]]] = {
-    Failure( new Exception)
-    //element1.apply(cadena)
+    val listaCreada = buildList(element1,cadena)
+    if (listaCreada._1 == List())
+      return Failure(new Exception)
+    else
+      return Try(ResultadoParseo(listaCreada._1,listaCreada._2))
+  }
+
+  def buildList(element1: Parser[T],cadena:String): (List[T],String) ={
+    val resultadoParseo = element1.apply(cadena)
+    resultadoParseo match {
+      case Success(_) => {
+        val resultadoSig = buildList(element1,resultadoParseo.get.cadenaRestante)
+        return (List[T](resultadoParseo.get.elementoParseado).appendedAll(resultadoSig._1),resultadoSig._2)
+      }
+      case Failure(_) =>{
+        return (List[T](),cadena);
+      }
+    }
   }
 }

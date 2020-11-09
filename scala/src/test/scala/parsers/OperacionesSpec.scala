@@ -56,4 +56,15 @@ class OperacionesSpec extends AnyFlatSpec with should.Matchers {
     talVezIn("ininina").get shouldEqual ResultadoParseo(List[String]("in","in","in"),"a")
   }
 
+
+  it should "parsear correctamente con 3 matcheos Clausura Positiva" in {
+    val talVezIn = string("in").+
+    talVezIn("ininina").get shouldEqual ResultadoParseo(List[String]("in","in","in"),"a")
+  }
+
+  it should "fallar con 0 matcheos Clausura Positiva" in {
+    val talVezIn = string("in").+
+    talVezIn("fija").isFailure shouldEqual true
+  }
+
 }
