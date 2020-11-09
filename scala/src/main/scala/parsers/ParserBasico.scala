@@ -121,7 +121,7 @@ case class SatisfiesOp[T](element1: Parser[T], f: T => Boolean) extends Parser[T
 
 case class OptOp[T](element1: Parser[T]) extends Parser[T]{
   override def apply(cadena :String): Try[ResultadoParseo[T]] = {
-    element1.apply(cadena).recoverWith{case _ => Success(ResultadoParseo(none[T],cadena))}
+    element1.apply(cadena).recoverWith{case _ => Success(ResultadoParseo(none[T].get,cadena))} // TODO: fix
   }
 
   def none[A]: Option[A] = None
