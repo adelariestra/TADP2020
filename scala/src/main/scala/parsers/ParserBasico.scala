@@ -3,10 +3,16 @@ package parsers
 import scala.util.{Failure, Success, Try}
 
 trait Parser[T] extends (String => Try[ResultadoParseo[T]]) {
+  // combinator
   def <>[U](parser2: Parser[U]) = ConcatComb[T, U](this, parser2)
   def <|>[U](parser2: Parser[U]) = ORComb[T, U](this, parser2)
   def <~[U](parser2: Parser[U]) = LeftComb[T, U](this, parser2)
   def ~>[U](parser2: Parser[U]) = RightComb[T, U](this, parser2)
+  //TODO: sepBy pending
+
+  // operators
+  def satisfies(funcion: T=>Boolean ) = SatisfiesOp(this,funcion)
+
 }
 
 case object anyChar extends Parser[Char] {
@@ -103,5 +109,11 @@ case class LeftComb[T,U](element1: Parser[T], element2: Parser[U]) extends Parse
       element2.apply(result1.get.cadenaRestante).get // TODO: Mejorar
       return result1
     }.recoverWith{ case e:Exception => return Failure(e) }
+  }
+}
+
+case class SatisfiesOp[T](element1: Parser[T], f: T => Boolean) extends Parser[T]{
+  override def apply(cadena :String): Try[ResultadoParseo[T]] = {
+    element1.apply(cadena).filter(elem=> f(elem.elementoParseado))
   }
 }

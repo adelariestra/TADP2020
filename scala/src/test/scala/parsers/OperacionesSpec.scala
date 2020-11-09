@@ -8,33 +8,33 @@ import scala.util.Try
 
 
 class OperacionesSpec extends AnyFlatSpec with should.Matchers {
-//
-//  it should "parsear correctamente con satisfies" in {
-//    val sat = integer.satisfies((element:Any)=> {true})
-//    sat.getResultado("8").get.getResultado() shouldEqual 8
-//  }
-//
-//  it should "parsear correctamente con condicion que use resultado" in {
-//    val sat = integer.satisfies((element:Any)=> element == 8)
-//    sat.getResultado("8").get.getResultado() shouldEqual 8
-//  }
-//
-//  it should "fallar satisfies si falla condicion" in {
-//    val sat = integer.satisfies((element:Any)=> {false})
-//    sat.getResultado("8").isFailure shouldEqual true
-//  }
-//
-//  it should "fallar satisfies si falla condicion que use resultado" in {
-//    val sat = integer.satisfies((element:Any)=> {element == 9})
-//    sat.getResultado("8").isFailure shouldEqual true
-//
-//  }
-//
-//  it should "fallar satisfies si falla parser inicial" in {
-//    val aob = integer.satisfies((element:Any)=> {element == 8})
-//    aob.getResultado("450 450").isFailure shouldEqual true
-//  }
-//
+
+  it should "parsear correctamente con satisfies" in {
+    val sat = integer.satisfies((element:Any)=> {true})
+    sat("8").get shouldEqual ResultadoParseo(8,"")
+  }
+
+  it should "parsear correctamente con condicion que use resultado" in {
+    val sat = integer.satisfies((element:Any)=> element == 8)
+    sat("8").get shouldEqual ResultadoParseo(8,"")
+  }
+
+  it should "fallar satisfies si falla condicion" in {
+    val sat = integer.satisfies((element:Any)=> {false})
+    sat("8").isFailure shouldEqual(true)
+  }
+
+  it should "fallar satisfies si falla condicion que use resultado" in {
+    val sat = integer.satisfies((element:Any)=> {element == 9})
+    sat("8").isFailure shouldEqual(true)
+
+  }
+
+  it should "fallar satisfies si falla parser inicial" in {
+    val sat = integer.satisfies((element:Any)=> {element == 8})
+    sat("b8 8").isFailure shouldEqual(true)
+  }
+
 //  it should "parsear correctamente con opt positivo" in {
 //    val talVezIn = string("in").opt
 //    val precedencia = talVezIn <> string("fija")
