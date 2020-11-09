@@ -73,8 +73,20 @@ case object integer extends Parser[Int] {
 
 case object double extends Parser[Double] {
   override def apply(cadena: String) = {
-    // TODO: Implementar
-    Try(ResultadoParseo(8, ""))
+    val decimals = char('.') <> digit.+
+    val parserDouble = integer <> decimals.opt
+    parserDouble.apply(cadena).map((elem: ResultadoParseo[Tuple2[Int,Option[Tuple2[Char,List[Char]]]]]) => {
+      val stringInt = elem.elementoParseado._1.toString
+      val decimales = elem.elementoParseado._2
+      var stringCompleto =""
+      if (decimales.isDefined){
+        stringCompleto = stringInt.concat(".").concat(decimales.get._2.mkString)
+      }else{
+        stringCompleto = stringInt
+      }
+      ResultadoParseo(stringCompleto.toDouble, elem.cadenaRestante)
+    })
+
   }
 }
 
