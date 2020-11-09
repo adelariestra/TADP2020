@@ -5,67 +5,100 @@ import com.sun.net.httpserver.Authenticator.Failure
 import scala.util
 import scala.util.{Failure, Success, Try}
 
-trait Parser[T] extends (String => ResultadoParseo[T]){
-  def <|>(parser2: Parser[T]) = ORComb[T](this, parser2)
+/*object Parser{
+  def apply[T](r: => ResultadoParseo[T]) = {
+    try ParseoExitoso(r.elementoParseado, r.cadenaRestante) catch {
+      case error :Exception => ErrorParseo(r.cadenaRestante,error)
+    }
+  }
+}*/
 
-  //def <>(parser2: Parser[T]) = ConcatComb[(T,T)](this, parser2)
+trait Parser[T] extends (String => Try[ResultadoParseo[T]]) {
+  /*def <|>[U,V](parser2: Parser[U]) :Parser[V] = {
+    case ParseoExitoso => this
+    case Failure => parser2
+  }*/
+
+  //def <>[U](parser2: Parser[U]) = ConcatComb[T, U](this, parser2)
+
+  //def <~[U](parser2 :Parser[U]) = LeftComb[T,U](this, parser2)
 }
 
-case class ORComb[T](element1: Parser[T], element2: Parser[T]) extends Parser[T] {
-  override def apply(cadena :String) = {
-    if (element1.apply(cadena).isParseoExitoso) element1.apply(cadena)
+/*case class ParseoExitoso[T](elementoParseado: T, cadenaRestante: String) extends Parser[T]{
+  //def <|>[U](parser2: Parser[U]) = this
+}
+
+case class ErrorParseo[T](cadenaRestante: String, exception: Exception) extends Parser[T]{
+  //def <|>[U](parser2: Parser[U]) = parser2
+}*/
+
+/*
+case class ORComb[T, U, V >: T with U](element1: Parser[T], element2: Parser[U]) extends Parser[V] {
+  override def apply(cadena: String) = {
+    if (element1.apply(cadena).isSuccess) element1.apply(cadena)
     else element2.apply(cadena)
   }
 }
 
-case object anyChar extends Parser[Char] {
-  override def apply(cadena: String): ResultadoParseo[Char] = {
-    ResultadoParseo(' ', cadena).filter(elemento => !elemento.isEmpty)
-      .map(elemento => (elemento.head, elemento.tail))
+
+case class ConcatComb[T, U](element1: Parser[T], element2: Parser[U]) extends Parser[(T,U)] {
+  override def apply(cadena: String) = {
+    val resultado1 = element1.apply(cadena)
+    val resultado2 = Try(element2.apply(resultado1.get.cadenaRestante).get)
+    Try(ResultadoParseo((resultado1.get.elementoParseado, resultado2.get.elementoParseado), resultado2.get.cadenaRestante))
   }
 }
 
-case class char(charName :Char) extends Parser[Char] {
-  override def apply(cadena: String): ResultadoParseo[Char] = {
-    ResultadoParseo(' ', cadena).filter(elemento => elemento.head.equals(charName))
-      .map(elemento => (elemento.head, elemento.tail))
+case class LeftComb[T,U](element1: Parser[T], element2: Parser[U]) extends Parser[T]{
+  override def apply(cadena :String): Try[ResultadoParseo[T]] = {
+    val resultado1 :Try[ResultadoParseo[T]] = element1.apply(cadena)
+    val resultado2 :Try[ResultadoParseo[U]] = Try(element2.apply(resultado1.get.cadenaRestante).get)
+    if(resultado2.isSuccess) resultado1
+    else ???
+  }
+}
+*/
+case object anyChar extends Parser[Char] {
+  override def apply(cadena: String) = {
+    Try(cadena).map(elemento => ResultadoParseo(elemento.head, elemento.tail))
+  }
+}
+
+case class char(charName: Char) extends Parser[Char] {
+  override def apply(cadena: String) = {
+    Try(cadena).filter(elemento => elemento.head.equals(charName))
+      .map(elemento => ResultadoParseo(elemento.head, elemento.tail))
   }
 }
 
 case object digit extends Parser[Char] {
-  override def apply(cadena: String): ResultadoParseo[Char] = {
-    ResultadoParseo(' ', cadena).filter(elemento => elemento.head.isDigit)
-      .map(elemento => (elemento.head, elemento.tail))
+  override def apply(cadena: String) = {
+    Try(cadena).filter(elemento => elemento.head.isDigit)
+      .map(elemento => ResultadoParseo(elemento.head, elemento.tail))
   }
 }
 
 case class string(stringName: String) extends Parser[String] {
-  override def apply(cadena: String): ResultadoParseo[String] = {
-    ResultadoParseo(" ", cadena).filter(elemento => elemento.take(stringName.length).equals(stringName))
-      .map(elemento => (elemento.take(stringName.length), elemento.drop(stringName.length)))
+  override def apply(cadena: String) = {
+    Try(cadena).filter(elemento => elemento.take(stringName.length).equals(stringName))
+      .map(elemento => ResultadoParseo(elemento.take(stringName.length), elemento.drop(stringName.length)))
   }
 }
 
-case object integer extends Parser[Char]{
-  override def apply(cadena: String): ResultadoParseo[Char] = {
-    ResultadoParseo(' ', cadena).flatMap(elemento => digit(elemento))
-  }
-}
-/*
-case object IntegerP extends Parser[Int] {
-  override def apply(cadena: String): ResultadoParseo[Int] = {
-    char('-').transform(
-      elem => getConcatParseado(elem.getTextoRestante(), "", true),
+case object integer extends Parser[Int] {
+  override def apply(cadena: String) :Try[ResultadoParseo[Int]] = {
+    char('-')(cadena).transform(
+      elem => getConcatParseado(elem.cadenaRestante, "", true),
       elem => getConcatParseado(cadena, "", false)
     )
   }
 
-  def getConcatParseado(cadena: String, valorParseado: String, esNegativo: Boolean): Try[ResultadoParseo] = {
-    DigitP.getResultado(cadena).transform(
+  def getConcatParseado(cadena: String, valorParseado: String, esNegativo: Boolean) :Try[ResultadoParseo[Int]] = {
+    digit(cadena).transform(
       elem => Success(
         getConcatParseado(
-          elem.textoRestante,
-          concatInt(valorParseado, elem.getResultado, esNegativo),
+          elem.cadenaRestante,
+          concatInt(valorParseado, elem.elementoParseado, esNegativo),
           false).get
       ),
       _ => Success(ResultadoParseo(valorParseado.toInt, cadena))
@@ -78,12 +111,19 @@ case object IntegerP extends Parser[Int] {
 
     (stringBase + valorAConcatenar)
   }
-  }
-*/
-
+}
 
 
 /*
+
+case object IntegerP extends Parser[Int] {
+  override def apply(cadena: String): ResultadoParseo[Int] = {
+    char('-').transform(
+      elem => getConcatParseado(elem.getTextoRestante(), "", true),
+      elem => getConcatParseado(cadena, "", false)
+    )
+  }
+
 // TODO: renombrar de parser basico a parser
 sealed trait ParserBasico {
 
