@@ -55,30 +55,20 @@ case class string(stringName: String) extends Parser[String] {
 
 case object integer extends Parser[Int] {
   override def apply(cadena: String): Try[ResultadoParseo[Int]] = {
-    char('-')(cadena).transform(
-      elem => getConcatParseado(elem.cadenaRestante, "", true),
-      elem => getConcatParseado(cadena, "", false)
-    )
+    val parserInteger = char('-').opt <> digit.+
+    parserInteger.apply(cadena).map((resultado: ResultadoParseo[Tuple2[Option[Char], List[Char]]]) => {
+      val menos = resultado.elementoParseado._1
+      var strigMenos = ""
+      if (menos.isDefined) {
+        strigMenos = menos.get.toString
+      } else {
+        strigMenos = "";
+      }
+      val stringCompleto = strigMenos.concat(resultado.elementoParseado._2.mkString);
+      ResultadoParseo(stringCompleto.toInt, resultado.cadenaRestante)
+    })
   }
 
-  def getConcatParseado(cadena: String, valorParseado: String, esNegativo: Boolean): Try[ResultadoParseo[Int]] = {
-    digit(cadena).transform(
-      elem => Success(
-        getConcatParseado(
-          elem.cadenaRestante,
-          concatInt(valorParseado, elem.elementoParseado, esNegativo),
-          false).get
-      ),
-      _ => Success(ResultadoParseo(valorParseado.toInt, cadena))
-    )
-  }
-
-  def concatInt(valorParseado: String, aConcatenar: Any, esNegativo: Boolean): String = {
-    var stringBase: String = if (esNegativo) "-" else valorParseado
-    val valorAConcatenar = aConcatenar
-
-    (stringBase + valorAConcatenar)
-  }
 }
 
 case object double extends Parser[Double] {
@@ -171,8 +161,8 @@ case class ClauPoseOp[T](element1: Parser[T]) extends Parser[List[T]] {
 
 case class MapOp[T, U](element1: Parser[T], f: T => U) extends Parser[U] {
   override def apply(cadena: String): Try[ResultadoParseo[U]] = {
-    element1.apply(cadena).map((elem:ResultadoParseo[T]) =>{
-      ResultadoParseo(f(elem.elementoParseado),elem.cadenaRestante)
+    element1.apply(cadena).map((elem: ResultadoParseo[T]) => {
+      ResultadoParseo(f(elem.elementoParseado), elem.cadenaRestante)
     })
   }
 }
