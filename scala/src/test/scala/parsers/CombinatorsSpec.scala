@@ -20,16 +20,21 @@ class CombinatorsSpec extends AnyFlatSpec with should.Matchers {
     aob("4-").isFailure shouldEqual true
   }
 
-//
-//  it should "parsear correctamente con combinator <|> matcheando con el primero" in {
-//    val aob = char('a') <|> char('b')
-//    aob("arbol").get shouldEqual('a', "rbol")
-//  }
-//
-//  it should "parsear correctamente con combinator <|> matcheando con el segundo" in {
-//    val aob = char('a') <|> char('b')
-//    aob("bol").get shouldEqual('b', "ol")
-//  }
+
+  it should "parsear correctamente con combinator <|> matcheando con el primero" in {
+    val aob = char('a') <|> char('b')
+    aob("arbol").get shouldEqual (ResultadoParseo('a', "rbol"))
+  }
+
+  it should "parsear correctamente con combinator <|> matcheando con el segundo" in {
+    val aob = char('a') <|> char('b')
+    aob("bol").get shouldEqual (ResultadoParseo('b', "ol"))
+  }
+
+  it should "parsear correctamente con combinator <|> matcheando con el segundo" in {
+    val aob = char('a') <|> char('b')
+    aob("bol").get shouldEqual (ResultadoParseo('b', "ol"))
+  }
 //
 //  it should "parsear correctamente con leftmost combinator" in {
 //    val aob = string("hola") <~ string("mundo")
