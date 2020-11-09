@@ -35,15 +35,15 @@ class OperacionesSpec extends AnyFlatSpec with should.Matchers {
     sat("b8 8").isFailure shouldEqual(true)
   }
 
-//  it should "parsear correctamente con opt positivo" in {
-//    val talVezIn = string("in").opt
-//    val precedencia = talVezIn <> string("fija")
-//    precedencia.getResultado("infija").get.getResultado() shouldEqual ("in","fija")
-//  }
-//  it should "parsear correctamente con opt negativo" in {
-//    val talVezIn = string("in").opt
-//    val precedencia = talVezIn <> string("fija")
-//    precedencia.getResultado("fija").get.getResultado() shouldEqual ("","fija")
-//  }
+  it should "parsear correctamente con opt positivo" in {
+    val talVezIn = string("in").opt
+    val precedencia = talVezIn <> string("fija")
+    precedencia("infija").get shouldEqual ResultadoParseo(("in","fija"),"")
+  }
+  it should "parsear correctamente con opt negativo" in {
+    val talVezIn = string("in").opt
+    val precedencia = talVezIn <> string("fija")
+    precedencia("fija").get shouldEqual ResultadoParseo(("","fija"),"")
+  }
 
 }

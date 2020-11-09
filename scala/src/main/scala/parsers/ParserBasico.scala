@@ -12,6 +12,7 @@ trait Parser[T] extends (String => Try[ResultadoParseo[T]]) {
 
   // operators
   def satisfies(funcion: T=>Boolean ) = SatisfiesOp(this,funcion)
+  def opt = OptOp(this)
 
 }
 
@@ -116,4 +117,12 @@ case class SatisfiesOp[T](element1: Parser[T], f: T => Boolean) extends Parser[T
   override def apply(cadena :String): Try[ResultadoParseo[T]] = {
     element1.apply(cadena).filter(elem=> f(elem.elementoParseado))
   }
+}
+
+case class OptOp[T](element1: Parser[T]) extends Parser[T]{
+  override def apply(cadena :String): Try[ResultadoParseo[T]] = {
+    element1.apply(cadena).recoverWith{case _ => Success(ResultadoParseo(none[T],cadena))}
+  }
+
+  def none[A]: Option[A] = None
 }
