@@ -5,15 +5,23 @@ import scala.util.{Failure, Success, Try}
 trait Parser[T] extends (String => Try[ResultadoParseo[T]]) {
   // combinator
   def <>[U](parser2: Parser[U]) = ConcatComb[T, U](this, parser2)
+
   def <|>[U](parser2: Parser[U]) = ORComb[T, U](this, parser2)
+
   def <~[U](parser2: Parser[U]) = LeftComb[T, U](this, parser2)
+
   def ~>[U](parser2: Parser[U]) = RightComb[T, U](this, parser2)
+
   //TODO: sepBy pending
 
   // operators
-  def satisfies(funcion: T=>Boolean ) = SatisfiesOp(this,funcion)
+  def satisfies(funcion: T => Boolean) = SatisfiesOp(this, funcion)
+
   def opt = OptOp(this)
 
+//  def * = KleeneOp(this)
+//
+//  def + = ClauPoseOp(this)
 }
 
 case object anyChar extends Parser[Char] {
@@ -87,42 +95,66 @@ case class ConcatComb[T, U](element1: Parser[T], element2: Parser[U]) extends Pa
 }
 
 case class ORComb[T, U](element1: Parser[T], element2: Parser[U]) extends Parser[Any] {
-  override def apply(cadena: String)= {
-    element1.apply(cadena).recoverWith{
+  override def apply(cadena: String) = {
+    element1.apply(cadena).recoverWith {
       case _ => element2.apply(cadena)
     }
   }
 }
 
-case class RightComb[T,U](element1: Parser[T], element2: Parser[U]) extends Parser[Any]{
-  override def apply(cadena :String): Try[ResultadoParseo[Any]] = {
+case class RightComb[T, U](element1: Parser[T], element2: Parser[U]) extends Parser[Any] {
+  override def apply(cadena: String): Try[ResultadoParseo[Any]] = {
     Try {
       val cadenaRestante = element1.apply(cadena).get.cadenaRestante
       element2.apply(cadenaRestante).get
-    }.recoverWith{ case e:Exception => return Failure(e) }
- }
+    }.recoverWith { case e: Exception => return Failure(e) }
+  }
 }
 
-case class LeftComb[T,U](element1: Parser[T], element2: Parser[U]) extends Parser[T]{
-  override def apply(cadena :String): Try[ResultadoParseo[T]] = {
+case class LeftComb[T, U](element1: Parser[T], element2: Parser[U]) extends Parser[T] {
+  override def apply(cadena: String): Try[ResultadoParseo[T]] = {
     Try {
       val result1 = element1.apply(cadena)
       element2.apply(result1.get.cadenaRestante).get // TODO: Mejorar
       return result1
-    }.recoverWith{ case e:Exception => return Failure(e) }
+    }.recoverWith { case e: Exception => return Failure(e) }
   }
 }
 
-case class SatisfiesOp[T](element1: Parser[T], f: T => Boolean) extends Parser[T]{
-  override def apply(cadena :String): Try[ResultadoParseo[T]] = {
-    element1.apply(cadena).filter(elem=> f(elem.elementoParseado))
+case class SatisfiesOp[T](element1: Parser[T], f: T => Boolean) extends Parser[T] {
+  override def apply(cadena: String): Try[ResultadoParseo[T]] = {
+    element1.apply(cadena).filter(elem => f(elem.elementoParseado))
   }
 }
 
-case class OptOp[T](element1: Parser[T]) extends Parser[T]{
-  override def apply(cadena :String): Try[ResultadoParseo[T]] = {
-    element1.apply(cadena).recoverWith{case _ => Success(ResultadoParseo(none[T].get,cadena))} // TODO: fix
+case class OptOp[T](element1: Parser[T]) extends Parser[Option[T]] {
+  override def apply(cadena: String):Try[ResultadoParseo[Option[T]]] = {
+    //Success(element1.apply(cadena).getOrElse(ResultadoParseo(none[T].get,cadena))) TODO: fix
+    Success(ResultadoParseo(Try(element1.apply(cadena).get.elementoParseado).toOption, element1.apply(cadena).getOrElse(ResultadoParseo("", cadena)).cadenaRestante))
   }
 
   def none[A]: Option[A] = None
 }
+
+//case class KleeneOp[T](element1: Parser[T]) extends Parser[List[T]] {
+//  override def apply(cadena: String) = {
+//    element1.apply(cadena)
+//    if (
+//
+//  }
+//}
+//
+//case class ClauPoseOp[T](element1: Parser[T]) extends Parser[List[T]] {
+//  override def apply(cadena: String) = {
+//    val result = element1.apply(cadena)
+//    result match {
+//      case Success => {
+//        element1.*.apply()
+//      }
+//      case Failure => {
+//        result
+//      }
+//    }
+//
+//  }
+//}

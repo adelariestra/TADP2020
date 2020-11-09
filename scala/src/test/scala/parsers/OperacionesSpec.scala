@@ -38,12 +38,12 @@ class OperacionesSpec extends AnyFlatSpec with should.Matchers {
   it should "parsear correctamente con opt positivo" in {
     val talVezIn = string("in").opt
     val precedencia = talVezIn <> string("fija")
-    precedencia("infija").get shouldEqual ResultadoParseo(("in","fija"),"")
+    precedencia("infija").get shouldEqual ResultadoParseo((Option("in"),"fija"),"")
   }
   it should "parsear correctamente con opt negativo" in {
     val talVezIn = string("in").opt
     val precedencia = talVezIn <> string("fija")
-    precedencia("fija").get shouldEqual ResultadoParseo(("","fija"),"")
+    precedencia("fija").get shouldEqual ResultadoParseo((None,"fija"),"")
   }
 
 }
