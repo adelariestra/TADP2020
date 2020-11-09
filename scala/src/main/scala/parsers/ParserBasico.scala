@@ -19,9 +19,9 @@ trait Parser[T] extends (String => Try[ResultadoParseo[T]]) {
 
   def opt = OptOp(this)
 
-//  def * = KleeneOp(this)
-//
-//  def + = ClauPoseOp(this)
+  def * = KleeneOp(this)
+
+  def + = ClauPoseOp(this)
 }
 
 case object anyChar extends Parser[Char] {
@@ -136,25 +136,15 @@ case class OptOp[T](element1: Parser[T]) extends Parser[Option[T]] {
   def none[A]: Option[A] = None
 }
 
-//case class KleeneOp[T](element1: Parser[T]) extends Parser[List[T]] {
-//  override def apply(cadena: String) = {
-//    element1.apply(cadena)
-//    if (
-//
-//  }
-//}
-//
-//case class ClauPoseOp[T](element1: Parser[T]) extends Parser[List[T]] {
-//  override def apply(cadena: String) = {
-//    val result = element1.apply(cadena)
-//    result match {
-//      case Success => {
-//        element1.*.apply()
-//      }
-//      case Failure => {
-//        result
-//      }
-//    }
-//
-//  }
-//}
+case class KleeneOp[T](element1: Parser[T]) extends Parser[List[T]] {
+  override def apply(cadena: String):Try[ResultadoParseo[List[T]]] = {
+    element1.+.apply(cadena).recoverWith {case _ => Success(ResultadoParseo(List[T](),cadena))}
+  }
+}
+
+case class ClauPoseOp[T](element1: Parser[T]) extends Parser[List[T]] {
+  override def apply(cadena: String):Try[ResultadoParseo[List[T]]] = {
+    Failure( new Exception)
+    //element1.apply(cadena)
+  }
+}
