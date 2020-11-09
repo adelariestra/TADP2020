@@ -67,4 +67,14 @@ class OperacionesSpec extends AnyFlatSpec with should.Matchers {
     talVezIn("fija").isFailure shouldEqual true
   }
 
+  it should "parsear correctamente con funcion transformacion Map" in {
+    val intCool = integer.map((element) => {element.toString()})
+    intCool("88").get shouldEqual ResultadoParseo("88","")
+  }
+
+  it should "fallar si no matchea parser map" in {
+    val intCool = integer.map((element) => {element.toString()})
+    intCool("a88").isFailure shouldEqual true
+  }
+
 }
