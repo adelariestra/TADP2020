@@ -12,7 +12,7 @@ trait Parser[T] extends (String => Try[ResultadoParseo[T]]) {
 
   def ~>[U](parser2: Parser[U]) = RightComb[T, U](this, parser2)
 
-  //TODO: sepBy pending
+  def sepBy[U](parser2: Parser[U]) = SepComb[T, U](this, parser2)
 
   // operators
   def satisfies(funcion: T => Boolean) = SatisfiesOp(this, funcion)
@@ -71,6 +71,7 @@ case object integer extends Parser[Int] {
 
 }
 
+// TODO: esta muy acoplado, pasar respons de obtener elementos a los case objects/clases?
 case object double extends Parser[Double] {
   override def apply(cadena: String) = {
     val decimals = char('.') <> digit.+
@@ -89,6 +90,9 @@ case object double extends Parser[Double] {
 
   }
 }
+
+
+// COMBINATORS TODO: Pasar a archivo aparte
 
 case class ConcatComb[T, U](element1: Parser[T], element2: Parser[U]) extends Parser[(T, U)] {
   override def apply(cadena: String) = {
@@ -125,6 +129,24 @@ case class LeftComb[T, U](element1: Parser[T], element2: Parser[U]) extends Pars
   }
 }
 
+case class SepComb[T, U](elementContent: Parser[T], elementSeparator: Parser[U]) extends Parser[List[T]] {
+  override def apply(cadena: String): Try[ResultadoParseo[List[T]]] = {
+    val secondElement = elementSeparator <> elementContent
+    val fullParser = elementContent <> secondElement.*
+
+    fullParser.apply(cadena).map((elem: ResultadoParseo[Tuple2[T,List[Tuple2[U,T]]]])=>{
+      val listaTuplas = elem.elementoParseado._2
+      val listaCompleta = List(elem.elementoParseado._1).appendedAll(listaTuplas.map((elem:Tuple2[U,T])=>{
+        elem._2
+      }))
+        ResultadoParseo(listaCompleta, elem.cadenaRestante)
+    })
+  }
+}
+
+
+// OPERATORS TODO: pasar a archivo aparte
+
 case class SatisfiesOp[T](element1: Parser[T], f: T => Boolean) extends Parser[T] {
   override def apply(cadena: String): Try[ResultadoParseo[T]] = {
     element1.apply(cadena).filter(elem => f(elem.elementoParseado))
@@ -147,7 +169,6 @@ case class KleeneOp[T](element1: Parser[T]) extends Parser[List[T]] {
 }
 
 case class ClauPoseOp[T](element1: Parser[T]) extends Parser[List[T]] {
-
 
   override def apply(cadena: String): Try[ResultadoParseo[List[T]]] = {
     val listaCreada = buildList(element1, cadena)

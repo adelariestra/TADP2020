@@ -20,7 +20,6 @@ class CombinatorsSpec extends AnyFlatSpec with should.Matchers {
     aob("4-").isFailure shouldEqual true
   }
 
-
   it should "parsear correctamente con combinator <|> matcheando con el primero" in {
     val aob = char('a') <|> char('b')
     aob("arbol").get shouldEqual (ResultadoParseo('a', "rbol"))
@@ -60,15 +59,20 @@ class CombinatorsSpec extends AnyFlatSpec with should.Matchers {
     val aob = string("hola") ~> string("holadiferente")
     aob("holamundo").isFailure shouldEqual true
   }
-//
-//  it should "parsear correctamente con sepBy combinator" in {
-//    val aob = integer.sepBy(char('-'))
-//    aob.parsear("450-450").get shouldEqual "450-450"
-//  }
-//
-//  it should "fallar sepBy combinator" in {
-//    val aob = integer.sepBy(char('-'))
-//    aob.parsear("450 450").isFailure shouldEqual true
-//  }
+
+  it should "parsear correctamente un elemento con sepBy combinator" in {
+    val sepInts = integer.sepBy(char('-'))
+    sepInts("450extra").get shouldEqual ResultadoParseo(List[Int](450),"extra")
+  }
+
+  it should "parsear correctamente varios elementos con sepBy combinator" in {
+    val sepInts = integer.sepBy(char('-'))
+    sepInts("450-450extra").get shouldEqual ResultadoParseo(List[Int](450,450),"extra")
+  }
+
+  it should "fallar sepBy combinator si no matchea el parser" in {
+    val sepInts = string("ola").sepBy(char('-'))
+    sepInts("450-450extra").isFailure shouldEqual true
+  }
 
 }
