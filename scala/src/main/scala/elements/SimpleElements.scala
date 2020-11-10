@@ -56,13 +56,15 @@ case object rectangle extends Parser[RectangleFigure] {
 
 case object circle extends Parser[CircleFigure] {
   override def apply(cadena: String): Try[ResultadoParseo[CircleFigure]] = {
-    val parseadorGeneral = string("circulo[") <> positions <> integer <> char(']');
+    val parseadorGeneral = string("circulo[") <> positions <> string(", ") <> integer <> char(']');
 
     parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
   }
-  //TODO: refactor to common function betweem figures
-  def obtainFigure(result: ResultadoParseo[(((String, List[Position]), Int), Char)]): ResultadoParseo[CircleFigure] = {
-    val positionsList = result.elementoParseado._1._1._2
+
+
+//  TODO: refactor to common function betweem figures
+  def obtainFigure(result: ResultadoParseo[((((String, List[Position]), String), Int), Char)]): ResultadoParseo[CircleFigure] = {
+    val positionsList = result.elementoParseado._1._1._1._2
     if (positionsList.size != 1) throw new Exception("Invalid amount of elements:".concat(positionsList.size.toString)) //TODO: change exception type
 
     ResultadoParseo( //TODO: des-algoritmizar
