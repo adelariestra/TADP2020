@@ -4,84 +4,88 @@ import parsers.{Parser, ResultadoParseo, char, integer, string}
 
 import scala.util.Try
 
+case object positions extends Parser[List[Position]] {
+  override def apply(cadena: String): Try[ResultadoParseo[List[Position]]] = {
+      val parserPosicion = integer <> string(" @ ") <> integer
+      val parseadorGeneral = parserPosicion.sepBy(string(", "))
+
+    parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
+  }
+
+  //TODO: refactor to common function betweem figures
+  def obtainFigure(result: ResultadoParseo[List[((Int, String), Int)]]): ResultadoParseo[List[Position]] = {
+    val positionsList = result.elementoParseado
+    ResultadoParseo(positionsList.map((element)=>Position(element._1._1, element._2)),result.cadenaRestante)
+  }
+}
 
 case object triangle extends Parser[TriangleFigure] {
   override def apply(cadena: String): Try[ResultadoParseo[TriangleFigure]] = {
-    val parserPosiciones = integer.sepBy(string(" @ ")).sepBy(string(", "))
-    val parseadorGeneral = string("triangulo[") <> parserPosiciones <> char(']');
+    val parseadorGeneral = string("triangulo[") <> positions <> char(']');
 
     parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
   }
 
   // TODO: refactor to common function betweem figures
-  def obtainFigure(result: ResultadoParseo[((String, List[List[Int]]), Char)]): ResultadoParseo[TriangleFigure] = {
+  def obtainFigure(result: ResultadoParseo[((String, List[Position]), Char)]): ResultadoParseo[TriangleFigure] = {
     val positionsList = result.elementoParseado._1._2
     if (positionsList.size != 3) throw new Exception("Invalid amount of elements") //TODO: change exception type
     ResultadoParseo( //TODO: des-algoritmizar
-      TriangleFigure(
-        (positionsList(0)(0), positionsList(0)(1)),
-        (positionsList(1)(0), positionsList(1)(1)),
-        (positionsList(2)(0), positionsList(2)(1)))
+      TriangleFigure(positionsList(0),positionsList(1),positionsList(2))
       , result.cadenaRestante)
   }
 }
 
 case object rectangle extends Parser[RectangleFigure] {
   override def apply(cadena: String): Try[ResultadoParseo[RectangleFigure]] = {
-    val parserPosiciones = integer.sepBy(string(" @ ")).sepBy(string(", "))
-    val parseadorGeneral = string("rectangulo[") <> parserPosiciones <> char(']');
+    val parseadorGeneral = string("rectangulo[") <> positions <> char(']');
 
     parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
   }
 
   // TODO: refactor to common function betweem figures
-  def obtainFigure(result: ResultadoParseo[((String, List[List[Int]]), Char)]): ResultadoParseo[RectangleFigure] = {
+  def obtainFigure(result: ResultadoParseo[((String, List[Position]), Char)]): ResultadoParseo[RectangleFigure] = {
     val positionsList = result.elementoParseado._1._2
     if (positionsList.size != 2) throw new Exception("Invalid amount of elements") //TODO: change exception type
 
     ResultadoParseo( //TODO: des-algoritmizar
-      RectangleFigure(
-        (positionsList(0)(0), positionsList(0)(1)),
-        (positionsList(1)(0), positionsList(1)(1)))
+      RectangleFigure(positionsList(0),positionsList(1))
       , result.cadenaRestante)
   }
 }
 
 case object circle extends Parser[CircleFigure] {
   override def apply(cadena: String): Try[ResultadoParseo[CircleFigure]] = {
-    val parserPosiciones = integer.sepBy(string(" @ ")).sepBy(string(", "))
-    val parseadorGeneral = string("circulo[") <> parserPosiciones <> char(']');
+    val parseadorGeneral = string("circulo[") <> positions <> integer <> char(']');
 
     parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
   }
-
-  // TODO: refactor to common function betweem figures
-  def obtainFigure(result: ResultadoParseo[((String, List[List[Int]]), Char)]): ResultadoParseo[CircleFigure] = {
-    val positionsList = result.elementoParseado._1._2
-    if (positionsList.size != 2) throw new Exception("Invalid amount of elements") //TODO: change exception type
-    if (positionsList(1).size != 1) throw new Exception("Invalid amount of elements") //TODO: change exception type
+  //TODO: refactor to common function betweem figures
+  def obtainFigure(result: ResultadoParseo[(((String, List[Position]), Int), Char)]): ResultadoParseo[CircleFigure] = {
+    val positionsList = result.elementoParseado._1._1._2
+    if (positionsList.size != 1) throw new Exception("Invalid amount of elements:".concat(positionsList.size.toString)) //TODO: change exception type
 
     ResultadoParseo( //TODO: des-algoritmizar
-      CircleFigure(
-        (positionsList(0)(0), positionsList(0)(1)),
-        (positionsList(1)(0)))
+      CircleFigure(positionsList(0),result.elementoParseado._1._2)
       , result.cadenaRestante)
   }
 }
 
 trait FigureTr ;
 
-case class TriangleFigure(int1: (Int, Int), int2: (Int, Int), int3: (Int, Int)) extends  FigureTr {
+case class TriangleFigure(int1: Position, int2: Position, int3: Position) extends  FigureTr {
   //   TODO: ver si es funcion que recibe parametros y devuelve
   //    triangulo o si es un objeto
 }
 
-case class RectangleFigure(int1: (Int, Int), int2: (Int, Int)) extends  FigureTr{
+case class RectangleFigure(int1: Position, int2: Position) extends  FigureTr{
   //   TODO: ver si es funcion que recibe parametros y devuelve
   //    triangulo o si es un objeto
 }
 
-case class CircleFigure(int1: (Int, Int),int2:Int) extends  FigureTr{
+case class CircleFigure(int1: Position,int2:Int) extends  FigureTr{
   //   TODO: ver si es funcion que recibe parametros y devuelve
   //    triangulo o si es un objeto
 }
+
+case class Position(posX: Int, posY: Int)
