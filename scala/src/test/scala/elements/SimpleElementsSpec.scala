@@ -14,4 +14,13 @@ class SimpleElementsSpec extends AnyFlatSpec with should.Matchers {
   it should "parsear incorrectamente un triángulo con mal tag" in {
     triangle("triangALO[0 @ 100, 200 @ 300, 150 @ 500]").isFailure shouldEqual true
   }
+  it should "parsear correctamente un rectángulo" in {
+    rectangle("rectangulo[0 @ 100, 200 @ 300]").get shouldEqual (ResultadoParseo((RectangleFigure((0, 100), (200, 300))), ""))
+  }
+  it should "parsear incorrectamente un rectángulo con 3 posiciones" in {
+    rectangle("rectangulo[186 @ 0, 400 @ 150, 400 @ 150]").isFailure shouldEqual true
+  }
+  it should "parsear incorrectamente un rectángulo con mal tag" in {
+    rectangle("triangALO[0 @ 100, 200 @ 300]").isFailure shouldEqual true
+  }
 }
