@@ -32,12 +32,13 @@ case class RightComb[T, U](element1: Parser[T], element2: Parser[U]) extends Par
   }
 }
 
+//Fue idea de Román cambiar esto
 case class LeftComb[T, U](element1: Parser[T], element2: Parser[U]) extends Parser[T] {
   override def apply(cadena: String): Try[ResultadoParseo[T]] = {
     Try {
       val result1 = element1.apply(cadena)
-      element2.apply(result1.get.cadenaRestante).get // TODO: Mejorar
-      return result1
+      val result2 = element2.apply(result1.get.cadenaRestante).get // TODO: Mejorar
+      return Try(ResultadoParseo(result1.get.elementoParseado, result2.cadenaRestante))
     }.recoverWith { case e: Exception => return Failure(e) }
   }
 }

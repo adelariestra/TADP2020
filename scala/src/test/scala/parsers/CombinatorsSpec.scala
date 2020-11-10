@@ -32,7 +32,7 @@ class CombinatorsSpec extends AnyFlatSpec with should.Matchers {
 
   it should "parsear correctamente con leftmost combinator" in {
     val aob = string("hola") <~ string("mundo")
-    aob("holamundo").get shouldEqual (ResultadoParseo("hola", "mundo"))
+    aob("holamundo").get shouldEqual (ResultadoParseo("hola", ""))
   }
 
   it should "fallar leftmost combinator si el segundo falla" in {
