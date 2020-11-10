@@ -7,12 +7,12 @@ import scala.util.Try
 
 case object group extends Parser[GroupFigure] {
   override def apply(cadena: String): Try[ResultadoParseo[GroupFigure]] = {
+    // TODO: armar como hicimos con positions un parser aux para /n/t y los espacios pertinentes para usar como separador
     val parseadorGeneral = string("grupo(") <> figure.sepBy(string(", ")) <> char(')');
     parseadorGeneral.apply(cadena).map((element)=>obtainFigure(element))
   }
 
   def obtainFigure(result: ResultadoParseo[((String, List[FigureTr]), Char)])={
-
     ResultadoParseo(GroupFigure(result.elementoParseado._1._2),result.cadenaRestante)
   }
 }
