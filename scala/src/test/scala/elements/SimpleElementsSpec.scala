@@ -23,4 +23,13 @@ class SimpleElementsSpec extends AnyFlatSpec with should.Matchers {
   it should "parsear incorrectamente un rectángulo con mal tag" in {
     rectangle("triangALO[0 @ 100, 200 @ 300]").isFailure shouldEqual true
   }
+  it should "parsear correctamente un circulo" in {
+    circle("circulo[100 @ 100, 50]").get shouldEqual (ResultadoParseo((CircleFigure((100, 100),50)), ""))
+  }
+  it should "parsear incorrectamente un circulo con 2 posiciones pero 2 elementos en la segunda" in {
+    circle("circulo[186 @ 0, 400 @ 150]").isFailure shouldEqual true
+  }
+  it should "parsear incorrectamente un circulo con mal tag" in {
+    circle("triangALO[0 @ 100, 200]").isFailure shouldEqual true
+  }
 }
