@@ -6,7 +6,8 @@ trait Parser[T] extends (String => Try[ResultadoParseo[T]]) {
   // combinator
   def <>[U](parser2: Parser[U]) = ConcatComb[T, U](this, parser2)
 
-  def <|>[U](parser2: Parser[U]) = ORComb[T, U](this, parser2)
+  // TODO: Revisar limites de tipos
+  def <|>[U<:V,V >:T](parser2: Parser[U]) = ORComb[T, U,V](this, parser2)
 
   def <~[U](parser2: Parser[U]) = LeftComb[T, U](this, parser2)
 
