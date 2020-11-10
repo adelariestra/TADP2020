@@ -15,7 +15,8 @@ case object espacios extends Parser[String]{
 case object group extends Parser[GroupFigure] {
   override def apply(cadena: String): Try[ResultadoParseo[GroupFigure]] = {
     // TODO: faltan los /n y /t dentro del sepBy
-    val parseadorGeneral = string("grupo(") <~ espacios <> figure.sepBy(string(", ")) <~ espacios <> char(')');
+    val parseadorAux = string(",") <~ espacios
+    val parseadorGeneral = string("grupo(") <~ espacios <> figure.sepBy(parseadorAux) <~ espacios <> char(')');
     parseadorGeneral.apply(cadena).map((element)=>obtainFigure(element))
   }
 
