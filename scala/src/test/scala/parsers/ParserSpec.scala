@@ -1,15 +1,13 @@
-package tadp
+package parsers
 
 import com.sun.net.httpserver.Authenticator.Success
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 
 import scala.util.Success
-//import parsers.Parsertest._
 import parsers._
 
 class ParserSpec extends AnyFlatSpec with should.Matchers {
-
   it should "parsear correctamente cualquier AnyCharP" in {
     anyChar("armenia").get shouldEqual ResultadoParseo('a', "rmenia")
   }

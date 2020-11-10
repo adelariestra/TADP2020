@@ -2,7 +2,6 @@ package parsers
 
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
-//import parsers.Parsertest._
 
 import scala.util.Try
 
