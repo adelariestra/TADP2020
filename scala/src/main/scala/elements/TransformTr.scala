@@ -1,5 +1,6 @@
 package elements
 
+// TODO: refactor a lista + parametros [List[FigureTr],_]
 trait TransformTr extends  FigureTr
 
 case class EscalaTr(figuresContained: List[FigureTr],val1: Double, val2: Double) extends TransformTr {

@@ -57,26 +57,24 @@ case object rotacion extends Parser[RotacionTr] {
   }
 }
 
-//case object traslacion extends Parser[TransformTr] {
-//  override def apply(cadena: String): Try[ResultadoParseo[GroupFigure]] = {
-//    val parseadorAux = string(",") <~ espacios
-//    val parseadorGeneral = string("grupo(") <~ espacios <> figure.sepBy(parseadorAux) <~ espacios <~ char(')');
-//    parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
-//  }
-//
-//  def obtainFigure(result: ResultadoParseo[(String, List[FigureTr])]) = {
-//    ResultadoParseo(GroupFigure(result.elementoParseado._2), result.cadenaRestante)
-//  }
-//}
-//case object color extends Parser[TransformTr] {
-//  override def apply(cadena: String): Try[ResultadoParseo[GroupFigure]] = {
-//    val parseadorAux = string(",") <~ espacios
-//    val parseadorGeneral = string("grupo(") <~ espacios <> figure.sepBy(parseadorAux) <~ espacios <~ char(')');
-//    parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
-//  }
-//
-//  def obtainFigure(result: ResultadoParseo[(String, List[FigureTr])]) = {
-//    ResultadoParseo(GroupFigure(result.elementoParseado._2), result.cadenaRestante)
-//  }
-//}
+case object traslacion extends Parser[TraslacionTr] {
+  override def apply(cadena: String): Try[ResultadoParseo[TraslacionTr]] = {
+    val parseadorGeneral = string("traslacion[") ~> integer <~ string(", ") <> integer <~ string("]") <> groupContent;
+    parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
+  }
+
+  def obtainFigure(result: ResultadoParseo[((Int,Int), List[FigureTr])]) = {
+    ResultadoParseo(TraslacionTr(result.elementoParseado._2,result.elementoParseado._1._1, result.elementoParseado._1._2), result.cadenaRestante)
+  }
+}
+case object color extends Parser[ColorTr] {
+  override def apply(cadena: String): Try[ResultadoParseo[ColorTr]] = {
+    val parseadorGeneral = string("color[") ~> integer <~ string(", ") <> integer <~ string(", ") <> integer <~ string("]") <> groupContent;
+    parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
+  }
+
+  def obtainFigure(result: ResultadoParseo[(((Int,Int),Int), List[FigureTr])]) = {
+    ResultadoParseo(ColorTr(result.elementoParseado._2,result.elementoParseado._1._1._1, result.elementoParseado._1._1._2,result.elementoParseado._1._2), result.cadenaRestante)
+  }
+}
 
