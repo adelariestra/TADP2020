@@ -40,7 +40,7 @@ case object escala extends Parser[EscalaTr] {
   }
 
   def obtainFigure(result: ResultadoParseo[((Double,Double), List[FigureTr])]) = {
-    ResultadoParseo(EscalaTr(result.elementoParseado._2, result.elementoParseado._1._1), result.cadenaRestante)
+    ResultadoParseo(EscalaTr(result.elementoParseado._2.head, result.elementoParseado._1._1), result.cadenaRestante)
   }
 }
 
@@ -52,7 +52,7 @@ case object rotacion extends Parser[RotacionTr] {
   }
 
   def obtainFigure(result: ResultadoParseo[((Int), List[FigureTr])]) = {
-    ResultadoParseo(RotacionTr(result.elementoParseado._2,result.elementoParseado._1), result.cadenaRestante)
+    ResultadoParseo(RotacionTr(result.elementoParseado._2.head,result.elementoParseado._1), result.cadenaRestante)
   }
 }
 
@@ -63,7 +63,7 @@ case object traslacion extends Parser[TraslacionTr] {
   }
 
   def obtainFigure(result: ResultadoParseo[((Int,Int), List[FigureTr])]) = {
-    ResultadoParseo(TraslacionTr(result.elementoParseado._2,result.elementoParseado._1._1, result.elementoParseado._1._2), result.cadenaRestante)
+    ResultadoParseo(TraslacionTr(result.elementoParseado._2.head,result.elementoParseado._1._1, result.elementoParseado._1._2), result.cadenaRestante)
   }
 }
 case object color extends Parser[ColorTr] {
@@ -73,7 +73,7 @@ case object color extends Parser[ColorTr] {
   }
 
   def obtainFigure(result: ResultadoParseo[(((Int,Int),Int), List[FigureTr])]) = {
-    ResultadoParseo(ColorTr(result.elementoParseado._2,result.elementoParseado._1._1._1, result.elementoParseado._1._1._2,result.elementoParseado._1._2), result.cadenaRestante)
+    ResultadoParseo(ColorTr(result.elementoParseado._2.head,result.elementoParseado._1._1._1, result.elementoParseado._1._1._2,result.elementoParseado._1._2), result.cadenaRestante)
   }
 }
 

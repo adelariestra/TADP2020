@@ -54,3 +54,4 @@ case object circle extends Parser[CircleFigure] {
       , result.cadenaRestante)
   }
 }
+
