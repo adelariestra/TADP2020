@@ -4,8 +4,6 @@ import parsers.{Parser, ResultadoParseo, char, integer, string}
 
 import scala.util.Try
 
-
-
 case object triangle extends Parser[TriangleFigure] {
   override def apply(cadena: String): Try[ResultadoParseo[TriangleFigure]] = {
     val parseadorGeneral = string("triangulo[") ~> positions <~ char(']');

@@ -17,8 +17,7 @@ case class CircleFigure(int1: Position, int2: Int) extends FigureTr {
   //    triangulo o si es un objeto
 }
 
-//TODO: pasar a ComplexElement y aprovechar con TransformElem
-case class GroupFigure(int1: List[FigureTr]) extends  FigureTr {
+case class GroupFigure(figuresContained: List[FigureTr]) extends  FigureTr {
   //   TODO: ver si es funcion que recibe parametros y devuelve
   //    triangulo o si es un objeto
 }
