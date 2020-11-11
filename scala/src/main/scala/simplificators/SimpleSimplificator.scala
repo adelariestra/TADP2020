@@ -24,6 +24,12 @@ case object nestedColorSimp extends SimpleSimplificator{
   def simplify(mainFigure:FigureTr): FigureTr ={
     mainFigure match {
       case ColorTr(List(ColorTr(contentList,a,b,c)),_,_,_) => ColorTr(contentList,a,b,c)
+      // TODO: fix pattern matching
+      case ColorTr(elementList,values) =>{ColorTr(elementList.map((element)=>simplify(element)),values)}
+      case EscalaTr(elementList,values) =>{EscalaTr(elementList.map((element)=>simplify(element)),values)}
+      case RotacionTr(elementList,values) =>{RotacionTr(elementList.map((element)=>simplify(element)),values)}
+      case TraslacionTr(elementList,values) =>{TraslacionTr(elementList.map((element)=>simplify(element)),values)}
+      case GroupFigure(elementList) =>{GroupFigure(elementList.map((element)=>simplify(element)))}
     }
   }
 }

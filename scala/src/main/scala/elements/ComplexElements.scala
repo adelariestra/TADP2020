@@ -40,7 +40,7 @@ case object escala extends Parser[EscalaTr] {
   }
 
   def obtainFigure(result: ResultadoParseo[((Double,Double), List[FigureTr])]) = {
-    ResultadoParseo(EscalaTr(result.elementoParseado._2,result.elementoParseado._1._1, result.elementoParseado._1._2), result.cadenaRestante)
+    ResultadoParseo(EscalaTr(result.elementoParseado._2, result.elementoParseado._1._1), result.cadenaRestante)
   }
 }
 

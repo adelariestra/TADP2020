@@ -16,11 +16,11 @@ class ComplexElementsSpec extends AnyFlatSpec with should.Matchers {
   // TODO: make tests for transformation fails
 
   it should "parsear correctamente una escala con un componente" in {
-    escala("escala[6, 15](\n\tcirculo[0 @ 5, 10]\n)").get shouldEqual (ResultadoParseo(EscalaTr(List(CircleFigure(Position(0, 5), 10)),6,15), ""))
+    escala("escala[6, 15](\n\tcirculo[0 @ 5, 10]\n)").get shouldEqual (ResultadoParseo(EscalaTr(List(CircleFigure(Position(0, 5), 10)), 6), ""))
   }
 
   it should "parsear correctamente una escala con más de un componente" in {
-    escala("escala[6, 15](\n\tcirculo[0 @ 5, 10],\n\tcirculo[0 @ 5, 10]\n)").get shouldEqual (ResultadoParseo(EscalaTr(List(CircleFigure(Position(0, 5), 10),CircleFigure(Position(0, 5), 10)),6,15), ""))
+    escala("escala[6, 15](\n\tcirculo[0 @ 5, 10],\n\tcirculo[0 @ 5, 10]\n)").get shouldEqual (ResultadoParseo(EscalaTr(List(CircleFigure(Position(0, 5), 10),CircleFigure(Position(0, 5), 10)), 6), ""))
   }
 
   it should "parsear correctamente una rotacion con un componente" in {
