@@ -46,4 +46,12 @@ class ComplexElementsSpec extends AnyFlatSpec with should.Matchers {
   it should "parsear correctamente una color con más de un componente" in {
     color("color[6, 6, 6](\n\tcirculo[0 @ 5, 10],\n\tcirculo[0 @ 5, 10]\n)").get shouldEqual (ResultadoParseo(ColorTr(List(CircleFigure(Position(0, 5), 10),CircleFigure(Position(0, 5), 10)),6,6,6), ""))
   }
+
+  it should "parsear correctamente una cadena larga anidada" in {
+    group("grupo(\n    grupo(\n   \t triangulo[250 @ 150, 150 @ 300, 350 @ 300],\n   \t triangulo[150 @ 300, 50 @ 450, 250 @ 450],\n   \t triangulo[350 @ 300, 250 @ 450, 450 @ 450]\n    ),\n    grupo(\n   \t rectangulo[460 @ 90, 470 @ 100],\n   \t rectangulo[430 @ 210, 500 @ 220],\n   \t rectangulo[430 @ 210, 440 @ 230],\n   \t rectangulo[490 @ 210, 500 @ 230],\n   \t rectangulo[450 @ 100, 480 @ 260]\n    )\n)").isSuccess shouldEqual true
+  }
+
+  it should "parsear correctamente una cadena larga anidada2" in {
+    group("grupo(\n   \t triangulo[250 @ 150, 150 @ 300, 350 @ 300],\n   \t triangulo[150 @ 300, 50 @ 450, 250 @ 450],\n   \t triangulo[350 @ 300, 250 @ 450, 450 @ 450]\n    )").isSuccess shouldEqual true
+  }
 }

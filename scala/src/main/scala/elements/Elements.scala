@@ -6,8 +6,7 @@ import scala.util.Try
 
 case object figure extends Parser[FigureTr] {
   override def apply(cadena: String): Try[ResultadoParseo[FigureTr]] = {
-    val parsers1 = triangle <|> rectangle
-    val parseadorGeneral = parsers1 <|> circle
+    val parseadorGeneral = triangle <|> rectangle <|> circle <|> group <|> transformation
     parseadorGeneral.apply(cadena)
   }
 }

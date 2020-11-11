@@ -28,8 +28,7 @@ case object groupContent extends Parser[List[FigureTr]] {
 
 case object transformation extends Parser[TransformTr] {
   override def apply(cadena: String): Try[ResultadoParseo[TransformTr]] = {
-    val parseadorGeneral = escala
-//    <|> rotacion <|> traslacion <|> color
+    val parseadorGeneral = escala <|> rotacion <|> traslacion <|> color
     parseadorGeneral.apply(cadena)
   }
 }
