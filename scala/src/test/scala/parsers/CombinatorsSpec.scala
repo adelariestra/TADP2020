@@ -7,12 +7,12 @@ import org.scalatest.matchers._
 class CombinatorsSpec extends AnyFlatSpec with should.Matchers {
   it should "parsear correctamente con combinator <>" in {
     val aob = string("hola") <> string("mundo")
-    aob("holamundo").get shouldEqual (ResultadoParseo(("hola", "mundo"), ""))
+    aob("holamundo").get shouldEqual ResultadoParseo(("hola", "mundo"), "")
   }
 
   it should "parsear correctamente con combinator <> con distintos tipos" in {
     val aob = integer <> string("mundo")
-    aob("71mundo").get shouldEqual (ResultadoParseo((71, "mundo"), ""))
+    aob("71mundo").get shouldEqual ResultadoParseo((71, "mundo"), "")
   }
 
   it should "el combinator <> debería fallar si alguno de los parsers falla" in {
@@ -22,17 +22,17 @@ class CombinatorsSpec extends AnyFlatSpec with should.Matchers {
 
   it should "parsear correctamente con combinator <|> matcheando con el primero" in {
     val aob = char('a') <|> char('b')
-    aob("arbol").get shouldEqual (ResultadoParseo('a', "rbol"))
+    aob("arbol").get shouldEqual ResultadoParseo('a', "rbol")
   }
 
   it should "parsear correctamente con combinator <|> matcheando con el segundo" in {
     val aob = char('a') <|> char('b')
-    aob("bol").get shouldEqual (ResultadoParseo('b', "ol"))
+    aob("bol").get shouldEqual ResultadoParseo('b', "ol")
   }
 
   it should "parsear correctamente con leftmost combinator" in {
     val aob = string("hola") <~ string("mundo")
-    aob("holamundo").get shouldEqual (ResultadoParseo("hola", ""))
+    aob("holamundo").get shouldEqual ResultadoParseo("hola", "")
   }
 
   it should "fallar leftmost combinator si el segundo falla" in {

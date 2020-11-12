@@ -4,7 +4,7 @@ import scala.util.{Failure, Try}
 
 
 case class ConcatComb[T, U](element1: Parser[T], element2: Parser[U]) extends Parser[(T, U)] {
-  override def apply(cadena: String) = {
+  override def apply(cadena: String): Try[ResultadoParseo[(T, U)]] = {
     val resultado1 = element1.apply(cadena)
     val resultado2 = Try(element2.apply(resultado1.get.cadenaRestante).get)
     Try(ResultadoParseo((resultado1.get.elementoParseado, resultado2.get.elementoParseado), resultado2.get.cadenaRestante))

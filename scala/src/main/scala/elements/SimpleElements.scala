@@ -6,9 +6,9 @@ import scala.util.Try
 
 case object triangle extends Parser[TriangleFigure] {
   override def apply(cadena: String): Try[ResultadoParseo[TriangleFigure]] = {
-    val parseadorGeneral = string("triangulo[") ~> positions <~ char(']');
+    val parseadorGeneral = string("triangulo[") ~> positions <~ char(']')
 
-    parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
+    parseadorGeneral.apply(cadena).map(element => obtainFigure(element))
   }
 
   // TODO: refactor to common function betweem figures
@@ -23,9 +23,9 @@ case object triangle extends Parser[TriangleFigure] {
 
 case object rectangle extends Parser[RectangleFigure] {
   override def apply(cadena: String): Try[ResultadoParseo[RectangleFigure]] = {
-    val parseadorGeneral = string("rectangulo[") ~> positions <~ char(']');
+    val parseadorGeneral = string("rectangulo[") ~> positions <~ char(']')
 
-    parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
+    parseadorGeneral.apply(cadena).map(element => obtainFigure(element))
   }
 
   def obtainFigure(result: ResultadoParseo[List[(Double,Double)]]): ResultadoParseo[RectangleFigure] = {
@@ -41,9 +41,9 @@ case object rectangle extends Parser[RectangleFigure] {
 case object circle extends Parser[CircleFigure] {
   override def apply(cadena: String): Try[ResultadoParseo[CircleFigure]] = {
     val elemSeparator = string(", ") <|> string(",")
-    val parseadorGeneral = string("circulo[") ~> positions <~ elemSeparator <> integer <~ char(']');
+    val parseadorGeneral = string("circulo[") ~> positions <~ elemSeparator <> integer <~ char(']')
 
-    parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
+    parseadorGeneral.apply(cadena).map(element => obtainFigure(element))
   }
 
   def obtainFigure(result: ResultadoParseo[(List[(Double,Double)], Int)]): ResultadoParseo[CircleFigure] = {

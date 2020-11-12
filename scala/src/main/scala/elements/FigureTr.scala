@@ -7,13 +7,13 @@ trait FigureTr {
     f(this)
   }
 
-  def drawUsing(adapter:TADPDrawingAdapter): TADPDrawingAdapter;
+  def drawUsing(adapter:TADPDrawingAdapter): TADPDrawingAdapter
 
   // TODO: para pattern matching, fix (puede ser Option o cambiar jerarquia)
   val figureContained:FigureTr = null
 }
 
-trait SimpleFigureTr extends  FigureTr;
+trait SimpleFigureTr extends  FigureTr
 
 case class TriangleFigure(int1: (Double,Double), int2: (Double,Double), int3: (Double,Double)) extends SimpleFigureTr {
   override def drawUsing(adapter: TADPDrawingAdapter): TADPDrawingAdapter = adapter.triangle(int1,int2,int3)

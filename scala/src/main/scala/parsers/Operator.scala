@@ -28,21 +28,19 @@ case class ClauPoseOp[T](element1: Parser[T]) extends Parser[List[T]] {
   override def apply(cadena: String): Try[ResultadoParseo[List[T]]] = {
     val listaCreada = buildList(element1, cadena)
     if (listaCreada._1 == List())
-      return Failure(new Exception) // TODO: cambiar nombre de excepción
+      Failure(new Exception) // TODO: cambiar nombre de excepción
     else
-      return Try(ResultadoParseo(listaCreada._1, listaCreada._2))
+      Try(ResultadoParseo(listaCreada._1, listaCreada._2))
   }
 
   def buildList(element1: Parser[T], cadena: String): (List[T], String) = {
     val resultado1 = element1.apply(cadena)
     resultado1 match {
-      case Success(_) => {
+      case Success(_) =>
         val resultadoSig = buildList(element1, resultado1.get.cadenaRestante)
-        return (List[T](resultado1.get.elementoParseado).appendedAll(resultadoSig._1), resultadoSig._2)
-      }
-      case Failure(_) => {
-        return (List[T](), cadena);
-      }
+        (List[T](resultado1.get.elementoParseado).appendedAll(resultadoSig._1), resultadoSig._2)
+      case Failure(_) =>
+        (List[T](), cadena)
     }
   }
 }

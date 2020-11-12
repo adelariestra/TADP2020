@@ -12,7 +12,7 @@ case object figure extends Parser[FigureTr] {
 }
 
 case object espacios extends Parser[String]{
-  override def apply(cadena :String) ={
+  override def apply(cadena :String): Try[ResultadoParseo[String]] ={
     val parserAux = string("\n") <|> string("\t") <|> string(" ")
     parserAux.*(cadena).map(elem => ResultadoParseo(elem.elementoParseado.toString(),elem.cadenaRestante))
   }

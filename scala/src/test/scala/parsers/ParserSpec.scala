@@ -1,11 +1,7 @@
 package parsers
 
-import com.sun.net.httpserver.Authenticator.Success
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
-
-import scala.util.Success
-import parsers._
 
 class ParserSpec extends AnyFlatSpec with should.Matchers {
   it should "parsear correctamente cualquier AnyCharP" in {
@@ -13,7 +9,7 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "parseo falla ante un no AnyCharP" in {
-    anyChar("").isFailure shouldEqual true // TODO: cambiar shoulEqual true por algun assert
+    anyChar("").isFailure shouldEqual true
   }
 
   it should "parsear correctamente CharP" in {
