@@ -5,10 +5,8 @@ import scalafx.scene.paint.Color
 import tadp.internal.TADPDrawingAdapter
 
 object TADPDrawingApp extends App {
-  def drawTree (figure:FigureTr){
+  def drawTree(figure: FigureTr) =
     TADPDrawingAdapter.forScreen {
-      adapter =>
-        figure.drawUsing(adapter)
+      adapter => figure.drawUsing(adapter)
     }
-  }
 }

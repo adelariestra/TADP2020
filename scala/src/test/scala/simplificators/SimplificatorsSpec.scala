@@ -13,6 +13,10 @@ class SimplificatorsSpec extends AnyFlatSpec with should.Matchers {
     figure("color[200, 200, 200](\n   color[6, 6, 6](circulo[0 @ 5, 10])\n)").get.elementoParseado.applyFunction(generalSimplificator) shouldEqual ColorTr((CircleFigure((0, 5), 10)), 6, 6, 6)
   }
 
+  it should "no simplificar un grupo con 2 elementos diferentes" in {
+    figure("grupo(\n   rectangulo[200 @ 200, 300 @ 400],\n   rectangulo[200 @ 300, 500 @ 700]\n)").get.elementoParseado.applyFunction(generalSimplificator) shouldEqual figure("grupo(\n   rectangulo[200 @ 200, 300 @ 400],\n   rectangulo[200 @ 300, 500 @ 700]\n)").get.elementoParseado
+  }
+
   it should "simplificar correctamente transformaciones comunes entre hijos color" in {
     figure("grupo(\n\tcolor[200, 200, 200](rectangulo[100 @ 100, 200 @ 200]),\n\tcolor[200, 200, 200](circulo[100 @ 300, 150])\n)").get.elementoParseado.applyFunction(generalSimplificator) shouldEqual figure("color[200, 200, 200](\n   grupo(\n\trectangulo[100 @ 100, 200 @ 200],\n\tcirculo[100 @ 300, 150]\n   )\n)").get.elementoParseado
   }

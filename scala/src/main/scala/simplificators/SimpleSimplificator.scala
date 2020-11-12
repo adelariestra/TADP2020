@@ -40,9 +40,9 @@ case object commonTrSimp extends SimpleSimplificator {
     mainFigure match {
       case GroupFigure(elementList) =>
         elementList.head match {
-          case EscalaTr(_, values) =>
-            if (elementList.forall(element => element.equals(EscalaTr(element.figureContained, values))))
-              EscalaTr(GroupFigure(elementList.map(element => element.figureContained)), values)
+          case EscalaTr(_, val1,val2) =>
+            if (elementList.forall(element => element.equals(EscalaTr(element.figureContained, val1,val2))))
+              EscalaTr(GroupFigure(elementList.map(element => element.figureContained)), val1,val2)
             else
               GroupFigure(elementList.map(element => simplify(element)))
 
@@ -65,7 +65,7 @@ case object commonTrSimp extends SimpleSimplificator {
               GroupFigure(elementList.map(element => simplify(element)))
 
           case GroupFigure(elementList) => GroupFigure(elementList.map(element => simplify(element)))
-          case anotherFigure: SimpleFigureTr => anotherFigure
+          case anotherFigure: SimpleFigureTr => GroupFigure(elementList)
         }
       case anotherFigure: SimpleFigureTr => anotherFigure
       case anotherFigure: TransformTr => anotherFigure
