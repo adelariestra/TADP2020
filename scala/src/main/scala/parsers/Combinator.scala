@@ -28,7 +28,6 @@ case class RightComb[T, U](element1: Parser[T], element2: Parser[U]) extends Par
   }
 }
 
-//Fue idea de Román cambiar esto
 case class LeftComb[T, U](element1: Parser[T], element2: Parser[U]) extends Parser[T] {
   override def apply(cadena: String): Try[ResultadoParseo[T]] = {
     Try {

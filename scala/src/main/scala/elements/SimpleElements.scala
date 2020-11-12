@@ -11,7 +11,6 @@ case object triangle extends Parser[TriangleFigure] {
     parseadorGeneral.apply(cadena).map(element => obtainFigure(element))
   }
 
-  // TODO: refactor to common function betweem figures
   def obtainFigure(result: ResultadoParseo[List[(Double,Double)]]): ResultadoParseo[TriangleFigure] = {
     val positionsList = result.elementoParseado
     if (positionsList.size != 3) throw new Exception("Invalid amount of elements") //TODO: change exception type

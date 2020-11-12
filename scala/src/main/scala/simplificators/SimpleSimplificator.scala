@@ -6,7 +6,6 @@ trait SimpleSimplificator extends (FigureTr => FigureTr)
 
 case object generalSimplificator extends SimpleSimplificator {
   override def apply(mainFigure: FigureTr): FigureTr = {
-    // TODO: convert to superior order
     mainFigure.applyFunction(nestedTrSimp)
       .applyFunction(commonTrSimp)
       .applyFunction(nullSimp)

@@ -5,8 +5,6 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 
 class SimplificatorsSpec extends AnyFlatSpec with should.Matchers {
-  //TODO: add more complex and nested tests
-
   it should "simplificar correctamente nested colors" in {
     figure("color[200, 200, 200](\n   color[6, 6, 6](circulo[0 @ 5, 10])\n)").get.elementoParseado.applyFunction(generalSimplificator) shouldEqual ColorTr(CircleFigure((0, 5), 10), 6, 6, 6)
   }

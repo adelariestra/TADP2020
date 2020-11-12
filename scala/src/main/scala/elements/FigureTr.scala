@@ -9,7 +9,6 @@ trait FigureTr {
 
   def drawUsing(adapter:TADPDrawingAdapter): TADPDrawingAdapter
 
-  // TODO: para pattern matching, fix (puede ser Option o cambiar jerarquia)
   val figureContained:FigureTr = null
 }
 
