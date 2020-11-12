@@ -1,9 +1,6 @@
 package simplificators
 
 import elements._
-import parsers.ResultadoParseo
-
-import scala.util.Try
 
 trait SimpleSimplificator extends (FigureTr => FigureTr)
 
@@ -17,43 +14,50 @@ case object generalSimplificator extends SimpleSimplificator {
 }
 
 case object nestedColorSimp extends SimpleSimplificator {
-  override def apply(mainFigure: FigureTr): FigureTr = {
-    simplify(mainFigure)
-  }
+  override def apply(mainFigure: FigureTr): FigureTr = simplify(mainFigure)
 
-  def simplify(mainFigure: FigureTr): FigureTr = {
+  def simplify(mainFigure: FigureTr): FigureTr =
     mainFigure match {
-      case ColorTr((ColorTr(figureContained, a, b, c)), _, _, _) => ColorTr(figureContained, a, b, c)
-      case GroupFigure(elementList) => GroupFigure(elementList.map((element) => simplify(element)))
-      case anotherFigure => if(anotherFigure.figureContained!=null) simplify(anotherFigure.figureContained) else anotherFigure
+      case ColorTr(ColorTr(figureContained, a, b, c), _, _, _) => ColorTr(figureContained, a, b, c)
+      case GroupFigure(elementList) => GroupFigure(elementList.map(element => simplify(element)))
+      case anotherFigure: SimpleFigureTr => anotherFigure
+      case anotherFigure: TransformTr => anotherFigure
     }
-  }
+
 }
 
 case object commonTrSimp extends SimpleSimplificator {
-  override def apply(mainFigure: FigureTr): FigureTr = {
-    simplify(mainFigure)
-  }
+  override def apply(mainFigure: FigureTr): FigureTr = simplify(mainFigure)
 
   def simplify(mainFigure: FigureTr): FigureTr = {
     mainFigure match {
-      case GroupFigure(elementList) => {
-        if (elementList.forall(_ == elementList.head)) // si hay hijos repes
-          elementList.head match{
-            case EscalaTr(figures,values)=>EscalaTr(GroupFigure(elementList.map(element=>element.figureContained)),values)
-            case RotacionTr(figures,values)=>RotacionTr(GroupFigure(elementList.map(element=>element.figureContained)),values)
-            case TraslacionTr(figures,values)=>TraslacionTr(GroupFigure(elementList.map(element=>element.figureContained)),values)
-            case ColorTr(figures,values)=> ColorTr(GroupFigure(elementList.map(element=>element.figureContained)),values)
-
-            case GroupFigure(elementList) => GroupFigure(elementList.map((element) => simplify(element)))
-//            case _ => GroupFigure(elementList)
-          }
-        else {
-          Console.println("NO MATCHEO")
-          GroupFigure(elementList.map((element) => simplify(element)))
+      case GroupFigure(elementList) =>
+        elementList.head match {
+          case EscalaTr(figure, values) =>
+            if (elementList.forall(element => element.equals(EscalaTr(element.figureContained, values))))
+              EscalaTr(GroupFigure(elementList.map(element => element.figureContained)), values)
+            else
+              EscalaTr(simplify(figure), values)
+          case RotacionTr(figure, val1) =>
+            if (elementList.forall(element => element.equals(RotacionTr(element.figureContained, val1))))
+              RotacionTr(GroupFigure(elementList.map(element => element.figureContained)), val1)
+            else
+              RotacionTr(simplify(figure), val1)
+          case TraslacionTr(figure, val1, val2) =>
+            if (elementList.forall(element => element.equals(TraslacionTr(element.figureContained, val1, val2))))
+              TraslacionTr(GroupFigure(elementList.map(element => element.figureContained)), val1, val2)
+            else
+              TraslacionTr(simplify(figure), val1, val2)
+          case ColorTr(figure, val1, val2, val3) =>
+            if (elementList.forall(element => element.equals(ColorTr(element.figureContained, val1, val2, val3))))
+              ColorTr(GroupFigure(elementList.map(element => element.figureContained)), val1, val2, val3)
+            else
+              ColorTr(simplify(figure), val1, val2, val3)
+          case GroupFigure(elementList) => GroupFigure(elementList.map(element => simplify(element)))
+          case anotherFigure: SimpleFigureTr => anotherFigure
         }
-      }
-      case anotherFigure =>  anotherFigure
+      case anotherFigure: SimpleFigureTr => anotherFigure
+      case anotherFigure: TransformTr => anotherFigure
     }
   }
 }

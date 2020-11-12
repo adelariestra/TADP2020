@@ -9,11 +9,13 @@ trait FigureTr {
   val figureContained:FigureTr = null
 }
 
-case class TriangleFigure(int1: Position, int2: Position, int3: Position) extends FigureTr
+trait SimpleFigureTr extends  FigureTr;
 
-case class RectangleFigure(int1: Position, int2: Position) extends FigureTr
+case class TriangleFigure(int1: Position, int2: Position, int3: Position) extends SimpleFigureTr
 
-case class CircleFigure(int1: Position, int2: Int) extends FigureTr
+case class RectangleFigure(int1: Position, int2: Position) extends SimpleFigureTr
+
+case class CircleFigure(int1: Position, int2: Int) extends SimpleFigureTr
 
 case class GroupFigure(figuresContained: List[FigureTr]) extends FigureTr
 
