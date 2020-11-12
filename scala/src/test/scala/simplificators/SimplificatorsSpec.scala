@@ -6,7 +6,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import parsers.ResultadoParseo
 
-class SimpleElementsSpec extends AnyFlatSpec with should.Matchers {
+class SimplificatorsSpec extends AnyFlatSpec with should.Matchers {
   //TODO: add more complex and nested tests
 
   it should "simplificar correctamente nested colors" in {
