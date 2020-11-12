@@ -4,9 +4,7 @@ import elements._
 import simplificators._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
-import parsers.ResultadoParseo
 import tadp.TADPDrawingApp
-import tadp.internal.TADPDrawingAdapter
 
 class DrawerSpec extends AnyFlatSpec with should.Matchers {
   //  it should "dibujar correctamente un circulo" in {
