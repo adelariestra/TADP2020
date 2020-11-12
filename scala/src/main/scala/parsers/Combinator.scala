@@ -9,10 +9,6 @@ case class ConcatComb[T, U](element1: Parser[T], element2: Parser[U]) extends Pa
     val resultado2 = Try(element2.apply(resultado1.get.cadenaRestante).get)
     Try(ResultadoParseo((resultado1.get.elementoParseado, resultado2.get.elementoParseado), resultado2.get.cadenaRestante))
   }
-  // TODO: define if we are going to do this refactor
-//  def getFirstElement(resultadoParseo: Try[ResultadoParseo[(T, U)]]): Try[T] ={
-//    resultadoParseo.map((elem:ResultadoParseo[(T, U)])=>elem.elementoParseado._1)
-//  }
 }
 
 case class ORComb[T <: V, U <: V, V](element1: Parser[T], element2: Parser[U]) extends Parser[V] {

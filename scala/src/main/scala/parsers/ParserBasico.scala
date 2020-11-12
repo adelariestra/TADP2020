@@ -28,9 +28,8 @@ trait Parser[T] extends (String => Try[ResultadoParseo[T]]) {
 }
 
 case object anyChar extends Parser[Char] {
-  override def apply(cadena: String) = {
+  override def apply(cadena: String) =
     Try(cadena).map(elemento => ResultadoParseo(elemento.head, elemento.tail))
-  }
 }
 
 case class char(charAMatchear: Char) extends Parser[Char] {
@@ -57,7 +56,8 @@ case class string(stringName: String) extends Parser[String] {
 case object integer extends Parser[Int] {
   override def apply(cadena: String): Try[ResultadoParseo[Int]] = {
     val parserInteger = char('-').opt <> digit.+
-    parserInteger.apply(cadena).map((resultado: ResultadoParseo[Tuple2[Option[Char], List[Char]]]) => {
+    parserInteger.apply(cadena).map((resultado: ResultadoParseo[(Option[Char], List[Char])]) => {
+      // TODO: emprolijar
       val menos = resultado.elementoParseado._1
       var strigMenos = ""
       if (menos.isDefined) {
