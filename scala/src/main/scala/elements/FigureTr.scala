@@ -4,7 +4,9 @@ trait FigureTr {
   def applyFunction(f: FigureTr => FigureTr): FigureTr ={
     f(this)
   }
-  val figureContained:FigureTr = null // TODO: para pattern matching, fix (puede ser Option)
+
+  // TODO: para pattern matching, fix (puede ser Option o cambiar jerarquia)
+  val figureContained:FigureTr = null
 }
 
 case class TriangleFigure(int1: Position, int2: Position, int3: Position) extends FigureTr
