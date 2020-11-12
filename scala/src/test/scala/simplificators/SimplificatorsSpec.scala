@@ -37,4 +37,21 @@ class SimpleElementsSpec extends AnyFlatSpec with should.Matchers {
     figure("traslacion[100, 5](\n\ttraslacion[20, 10](\n\t\tcirculo[0 @ 5, 10]\n)\n)").get.elementoParseado.applyFunction(generalSimplificator) shouldEqual figure("traslacion[120, 15](\n\tcirculo[0 @ 5, 10]\n)").get.elementoParseado
   }
 
+  it should "simplificar correctamente null rotacion" in {
+    figure("rotacion[0](\n\trectangulo[100 @ 200, 300 @ 400]\n)").get.elementoParseado.applyFunction(generalSimplificator) shouldEqual figure("rectangulo[100 @ 200, 300 @ 400]").get.elementoParseado
+  }
+
+  it should "simplificar correctamente null escala" in {
+    figure("escala[1, 1](\n\tcirculo[0 @ 5, 10]\n)").get.elementoParseado.applyFunction(generalSimplificator) shouldEqual figure("circulo[0 @ 5, 10]").get.elementoParseado
+  }
+
+  it should "simplificar correctamente null traslacion" in {
+    figure("traslacion[0, 0](\n\tcirculo[0 @ 5, 10]\n)").get.elementoParseado.applyFunction(generalSimplificator) shouldEqual figure("circulo[0 @ 5, 10]").get.elementoParseado
+  }
+
+  it should "simplificar correctamente rotacion con mas de 360 grados" in {
+    figure("rotacion[361](\n\trectangulo[100 @ 200, 300 @ 400]\n)").get.elementoParseado.applyFunction(generalSimplificator) shouldEqual figure("rotacion[1](\n\trectangulo[100 @ 200, 300 @ 400]\n)").get.elementoParseado
+  }
+
+
 }

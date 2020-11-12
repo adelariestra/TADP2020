@@ -9,7 +9,7 @@ case object generalSimplificator extends SimpleSimplificator {
     // TODO: convert to superior order
     mainFigure.applyFunction(nestedTrSimp)
       .applyFunction(commonTrSimp)
-    // TODO: implement the rest of functions
+      .applyFunction(nullSimp)
   }
 }
 
@@ -71,4 +71,23 @@ case object commonTrSimp extends SimpleSimplificator {
       case anotherFigure: TransformTr => anotherFigure
     }
   }
+}
+
+case object nullSimp extends SimpleSimplificator {
+  override def apply(mainFigure: FigureTr): FigureTr = simplify(mainFigure)
+
+  def simplify(mainFigure: FigureTr): FigureTr =
+    mainFigure match {
+      case EscalaTr(figure, 1, 1) => simplify(figure)
+      case RotacionTr(figure, 0) => simplify(figure)
+      case RotacionTr(figure, val1) => RotacionTr(simplify(figure), val1%360)
+      case TraslacionTr(figure, 0, 0) => simplify(figure)
+      case GroupFigure(elementList) => GroupFigure(elementList.map(element => simplify(element)))
+
+      case EscalaTr(figure, val1, val2) => EscalaTr(simplify(figure), val1, val2)
+      case TraslacionTr(figure, val1, val2) => TraslacionTr(simplify(figure), val1, val2)
+      case ColorTr(figure, val1, val2, val3) => ColorTr(simplify(figure), val1, val2, val3)
+      case anotherFigure: FigureTr => anotherFigure
+    }
+
 }
