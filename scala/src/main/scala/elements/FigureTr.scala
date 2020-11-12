@@ -28,6 +28,9 @@ case class CircleFigure(int1: (Double,Double), int2: Int) extends SimpleFigureTr
 }
 
 case class GroupFigure(figuresContained: List[FigureTr]) extends FigureTr {
-  override def drawUsing(adapter: TADPDrawingAdapter): TADPDrawingAdapter = adapter // TODO: imp missing figuresContained.map(fig=>fig.drawUsing(adapter))
+  override def drawUsing(adapter: TADPDrawingAdapter): TADPDrawingAdapter = {
+    // TODO: fix to use the new adapter
+    figuresContained.foldRight(adapter){ (fig:FigureTr,adapterin: TADPDrawingAdapter) => fig.drawUsing(adapterin)}
+  }
 }
 
