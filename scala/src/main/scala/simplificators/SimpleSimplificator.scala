@@ -37,22 +37,26 @@ case object commonTrSimp extends SimpleSimplificator {
             if (elementList.forall(element => element.equals(EscalaTr(element.figureContained, values))))
               EscalaTr(GroupFigure(elementList.map(element => element.figureContained)), values)
             else
-              EscalaTr(simplify(figure), values)
+              GroupFigure(elementList.map(element => simplify(element)))
+
           case RotacionTr(figure, val1) =>
             if (elementList.forall(element => element.equals(RotacionTr(element.figureContained, val1))))
               RotacionTr(GroupFigure(elementList.map(element => element.figureContained)), val1)
             else
-              RotacionTr(simplify(figure), val1)
+              GroupFigure(elementList.map(element => simplify(element)))
+
           case TraslacionTr(figure, val1, val2) =>
             if (elementList.forall(element => element.equals(TraslacionTr(element.figureContained, val1, val2))))
               TraslacionTr(GroupFigure(elementList.map(element => element.figureContained)), val1, val2)
             else
-              TraslacionTr(simplify(figure), val1, val2)
+              GroupFigure(elementList.map(element => simplify(element)))
+
           case ColorTr(figure, val1, val2, val3) =>
             if (elementList.forall(element => element.equals(ColorTr(element.figureContained, val1, val2, val3))))
               ColorTr(GroupFigure(elementList.map(element => element.figureContained)), val1, val2, val3)
             else
-              ColorTr(simplify(figure), val1, val2, val3)
+              GroupFigure(elementList.map(element => simplify(element)))
+              
           case GroupFigure(elementList) => GroupFigure(elementList.map(element => simplify(element)))
           case anotherFigure: SimpleFigureTr => anotherFigure
         }
