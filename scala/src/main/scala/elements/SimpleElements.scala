@@ -12,7 +12,7 @@ case object triangle extends Parser[TriangleFigure] {
   }
 
   // TODO: refactor to common function betweem figures
-  def obtainFigure(result: ResultadoParseo[List[Position]]): ResultadoParseo[TriangleFigure] = {
+  def obtainFigure(result: ResultadoParseo[List[(Double,Double)]]): ResultadoParseo[TriangleFigure] = {
     val positionsList = result.elementoParseado
     if (positionsList.size != 3) throw new Exception("Invalid amount of elements") //TODO: change exception type
     ResultadoParseo(
@@ -28,7 +28,7 @@ case object rectangle extends Parser[RectangleFigure] {
     parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
   }
 
-  def obtainFigure(result: ResultadoParseo[List[Position]]): ResultadoParseo[RectangleFigure] = {
+  def obtainFigure(result: ResultadoParseo[List[(Double,Double)]]): ResultadoParseo[RectangleFigure] = {
     val positionsList = result.elementoParseado
     if (positionsList.size != 2) throw new Exception("Invalid amount of elements") //TODO: change exception type
 
@@ -45,7 +45,7 @@ case object circle extends Parser[CircleFigure] {
     parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
   }
 
-  def obtainFigure(result: ResultadoParseo[(List[Position], Int)]): ResultadoParseo[CircleFigure] = {
+  def obtainFigure(result: ResultadoParseo[(List[(Double,Double)], Int)]): ResultadoParseo[CircleFigure] = {
     val positionsList = result.elementoParseado._1
     if (positionsList.size != 1) throw new Exception("Invalid amount of elements:".concat(positionsList.size.toString)) //TODO: change exception type
 

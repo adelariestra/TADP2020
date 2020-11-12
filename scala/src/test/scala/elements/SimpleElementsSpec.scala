@@ -6,16 +6,16 @@ import parsers.ResultadoParseo
 
 class SimpleElementsSpec extends AnyFlatSpec with should.Matchers {
   it should "parsear correctamente una posicion" in {
-    positions("0 @ 100").get shouldEqual (ResultadoParseo(List[Position](Position(0, 100)), ""))
+    positions("0 @ 100").get shouldEqual (ResultadoParseo(List[(Double,Double)]((0, 100)), ""))
   }
   it should "parsear correctamente mas de una posicion" in {
-    positions("0 @ 100, 200 @ 300, 150 @ 500").get shouldEqual (ResultadoParseo(List[Position](Position(0, 100), Position(200, 300), Position(150, 500)), ""))
+    positions("0 @ 100, 200 @ 300, 150 @ 500").get shouldEqual (ResultadoParseo(List[(Double,Double)]((0, 100), (200, 300), (150, 500)), ""))
   }
   it should "parsear incorrectamente algo que no sea una posicion" in {
     positions("0 X 100").isFailure shouldEqual true
   }
   it should "parsear correctamente un triángulo" in {
-    triangle("triangulo[0 @ 100, 200 @ 300, 150 @ 500]").get shouldEqual (ResultadoParseo((TriangleFigure(Position(0, 100), Position(200, 300), Position(150, 500))), ""))
+    triangle("triangulo[0 @ 100, 200 @ 300, 150 @ 500]").get shouldEqual (ResultadoParseo((TriangleFigure((0, 100), (200, 300), (150, 500))), ""))
   }
   it should "parsear incorrectamente un triángulo con 2 posiciones" in {
     triangle("triangulo[0 @ 100, 200 @ 300]").isFailure shouldEqual true
@@ -24,7 +24,7 @@ class SimpleElementsSpec extends AnyFlatSpec with should.Matchers {
     triangle("triangALO[0 @ 100, 200 @ 300, 150 @ 500]").isFailure shouldEqual true
   }
   it should "parsear correctamente un rectángulo" in {
-    rectangle("rectangulo[0 @ 100, 200 @ 300]").get shouldEqual (ResultadoParseo((RectangleFigure(Position(0, 100), Position(200, 300))), ""))
+    rectangle("rectangulo[0 @ 100, 200 @ 300]").get shouldEqual (ResultadoParseo((RectangleFigure((0, 100), (200, 300))), ""))
   }
   it should "parsear incorrectamente un rectángulo con 3 posiciones" in {
     rectangle("rectangulo[186 @ 0, 400 @ 150, 400 @ 150]").isFailure shouldEqual true
@@ -33,7 +33,7 @@ class SimpleElementsSpec extends AnyFlatSpec with should.Matchers {
     rectangle("triangALO[0 @ 100, 200 @ 300]").isFailure shouldEqual true
   }
   it should "parsear correctamente un circulo" in {
-    circle("circulo[100 @ 100, 50]").get shouldEqual (ResultadoParseo((CircleFigure(Position(100, 100), 50)), ""))
+    circle("circulo[100 @ 100, 50]").get shouldEqual (ResultadoParseo((CircleFigure((100, 100), 50)), ""))
   }
   it should "parsear incorrectamente un circulo con 2 posiciones pero 2 elementos en la segunda" in {
     circle("circulo[186 @ 0, 400 @ 150]").isFailure shouldEqual true
@@ -42,6 +42,6 @@ class SimpleElementsSpec extends AnyFlatSpec with should.Matchers {
     circle("triangALO[0 @ 100, 200]").isFailure shouldEqual true
   }
   it should "parsear correctamente un circulo con figure" in {
-    figure("circulo[100 @ 100, 50]").get shouldEqual (ResultadoParseo((CircleFigure(Position(100, 100), 50)), ""))
+    figure("circulo[100 @ 100, 50]").get shouldEqual (ResultadoParseo((CircleFigure((100, 100), 50)), ""))
   }
 }

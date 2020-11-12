@@ -18,17 +18,12 @@ case object espacios extends Parser[String]{
   }
 }
 
-case object positions extends Parser[List[Position]] {
-  override def apply(cadena: String): Try[ResultadoParseo[List[Position]]] = {
-    val parserPosicion = integer <~ string(" @ ") <> integer
+case object positions extends Parser[List[(Double,Double)]] {
+  override def apply(cadena: String): Try[ResultadoParseo[List[(Double,Double)]]] = {
+    val parserPosicion = double <~ string(" @ ") <> double
     val parseadorGeneral = parserPosicion.sepBy(string(", "))
 
-    parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
-  }
-
-  def obtainFigure(result: ResultadoParseo[List[(Int, Int)]]): ResultadoParseo[List[Position]] = {
-    val positionsList = result.elementoParseado
-    ResultadoParseo(positionsList.map((element) => Position(element._1, element._2)), result.cadenaRestante)
+    parseadorGeneral.apply(cadena)
   }
 }
 
