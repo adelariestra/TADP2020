@@ -40,7 +40,8 @@ case object rectangle extends Parser[RectangleFigure] {
 
 case object circle extends Parser[CircleFigure] {
   override def apply(cadena: String): Try[ResultadoParseo[CircleFigure]] = {
-    val parseadorGeneral = string("circulo[") ~> positions <~ string(", ") <> integer <~ char(']');
+    val elemSeparator = string(", ") <|> string(",")
+    val parseadorGeneral = string("circulo[") ~> positions <~ elemSeparator <> integer <~ char(']');
 
     parseadorGeneral.apply(cadena).map((element) => obtainFigure(element))
   }

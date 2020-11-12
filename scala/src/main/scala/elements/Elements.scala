@@ -20,8 +20,10 @@ case object espacios extends Parser[String]{
 
 case object positions extends Parser[List[(Double,Double)]] {
   override def apply(cadena: String): Try[ResultadoParseo[List[(Double,Double)]]] = {
-    val parserPosicion = double <~ string(" @ ") <> double
-    val parseadorGeneral = parserPosicion.sepBy(string(", "))
+    val posSeparator = string(" @ ") <|> string("@")
+    val elemSeparator = string(", ") <|> string(",")
+    val parserPosicion = double <~ posSeparator <> double
+    val parseadorGeneral = parserPosicion.sepBy(elemSeparator)
 
     parseadorGeneral.apply(cadena)
   }

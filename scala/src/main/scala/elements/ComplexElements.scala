@@ -39,7 +39,8 @@ case object transformation extends Parser[TransformTr] {
 
 case object escala extends Parser[EscalaTr] {
   override def apply(cadena: String): Try[ResultadoParseo[EscalaTr]] = {
-    val parseadorGeneral = string("escala[") ~> double <~ string(", ") <> double <~ string("]") <> figureContained
+    val elemSeparator = string(", ") <|> string(",")
+    val parseadorGeneral = string("escala[") ~> double <~ elemSeparator <> double <~ string("]") <> figureContained
     parseadorGeneral.apply(cadena).map(element => obtainFigure(element))
   }
 
@@ -61,7 +62,8 @@ case object rotacion extends Parser[RotacionTr] {
 
 case object traslacion extends Parser[TraslacionTr] {
   override def apply(cadena: String): Try[ResultadoParseo[TraslacionTr]] = {
-    val parseadorGeneral = string("traslacion[") ~> integer <~ string(", ") <> integer <~ string("]") <> figureContained
+    val elemSeparator = string(", ") <|> string(",")
+    val parseadorGeneral = string("traslacion[") ~> integer <~ elemSeparator <> integer <~ string("]") <> figureContained
     parseadorGeneral.apply(cadena).map(element => obtainFigure(element))
   }
 
@@ -71,7 +73,8 @@ case object traslacion extends Parser[TraslacionTr] {
 }
 case object color extends Parser[ColorTr] {
   override def apply(cadena: String): Try[ResultadoParseo[ColorTr]] = {
-    val parseadorGeneral = string("color[") ~> integer <~ string(", ") <> integer <~ string(", ") <> integer <~ string("]") <> figureContained
+    val elemSeparator = string(", ") <|> string(",")
+    val parseadorGeneral = string("color[") ~> integer <~ elemSeparator <> integer <~ elemSeparator <> integer <~ string("]") <> figureContained
     parseadorGeneral.apply(cadena).map(element => obtainFigure(element))
   }
 
