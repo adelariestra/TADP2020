@@ -55,18 +55,8 @@ case class string(stringName: String) extends Parser[String] {
 case object integer extends Parser[Int] {
   override def apply(cadena: String): Try[ResultadoParseo[Int]] = {
     val parserInteger = char('-').opt <> digit.+
-    parserInteger.apply(cadena).map((resultado: ResultadoParseo[(Option[Char], List[Char])]) => {
-      // TODO: emprolijar
-      val menos = resultado.elementoParseado._1
-      var strigMenos = ""
-      if (menos.isDefined) {
-        strigMenos = menos.get.toString
-      } else {
-        strigMenos = ""
-      }
-      val stringCompleto = strigMenos.concat(resultado.elementoParseado._2.mkString)
-      ResultadoParseo(stringCompleto.toInt, resultado.cadenaRestante)
-    })
+    val parserMap = parserInteger.map(tupla => (tupla._1.getOrElse("") + tupla._2.mkString("")).toInt)
+    parserMap.apply(cadena)
   }
 }
 
@@ -74,17 +64,13 @@ case object double extends Parser[Double] {
   override def apply(cadena: String): Try[ResultadoParseo[Double]] = {
     val decimals = char('.') <> digit.+
     val parserDouble = integer <> decimals.opt
-    parserDouble.apply(cadena).map((elem: ResultadoParseo[(Int, Option[(Char, List[Char])])]) => {
-      val stringInt = elem.elementoParseado._1.toString
-      val decimales = elem.elementoParseado._2
-      var stringCompleto =""
-      if (decimales.isDefined){
-        stringCompleto = stringInt.concat(".").concat(decimales.get._2.mkString)
-      }else{
-        stringCompleto = stringInt
+    val parserMap = parserDouble.map(
+      tupla => {
+        val decimales = tupla._2.map(tupla2 => tupla2._1 + tupla2._2.mkString(""))
+        (tupla._1.toString + decimales.getOrElse("")).toDouble
       }
-      ResultadoParseo(stringCompleto.toDouble, elem.cadenaRestante)
-    })
+    )
+    parserMap.apply(cadena)
   }
 }
 
